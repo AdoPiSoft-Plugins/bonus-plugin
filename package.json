@@ -1,0 +1,21 @@
+{
+  "name": "bonus-plugin",
+  "version": "1.0.0",
+  "description": "Bonus Plugin for Adopisoft Hotspot. You can now set a bonus session for your customer.",
+  "main": "index.js",
+  "repository": "git+https://github.com/jlenteria/bonus-plugin.git",
+  "author": "Jonel Lenteria",
+  "license": "ISC",
+  "metadata": {
+    "admin": {
+      "navigation": [
+        {
+          "parentstate": "plugins",
+          "icon": "fa fa-gift",
+          "text": "Bonus Plugin",
+          "href": "plugins.bonus_plugin"
+        }
+      ]
+    }
+  }
+}

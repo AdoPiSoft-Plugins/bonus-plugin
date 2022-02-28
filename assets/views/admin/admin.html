@@ -1,0 +1,22 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">Bonus Settings</div>
+  <div class="panel-body">
+    <form name="bonusForm">
+      <div class="checkbox">
+        <label class="custom-checkbox control-label">
+          <input type="checkbox" name="enable_bonus" ng-model="settings.enable_bonus">
+          <strong>Enable Bonus</strong>
+          <span class="help-block">When enabled, customers can have bonus session if they completed the challenges.</span>
+        </label>
+      </div>  
+    </form>
+    <hr>
+    <div ng-if="settings.enable_bonus">
+      <uib-tabset>
+        <uib-tab heading="Reach Certain Amount">
+          <certain-amount></certain-amount>
+        </uib-tab>
+      </uib-tabset>
+    </div>
+  </div>
+</div>
