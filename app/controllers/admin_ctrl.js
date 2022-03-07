@@ -1,4 +1,5 @@
 const config = require('../config.js')
+const bonus_sessions = require('../services/bonus_sessions.js')
 
 exports.get = async (req, res, next) => {
   try {

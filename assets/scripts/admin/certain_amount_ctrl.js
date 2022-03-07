@@ -8,7 +8,7 @@
     var $ctrl = this
 
     function load () {
-      $http.get('/bonus-plugin').then(res => {
+      $http.get('/bonus-plugin-settings').then(res => {
         $ctrl.settings = res.data
         $ctrl.certain_amount = $ctrl.settings.certain_amount
 
@@ -18,31 +18,13 @@
         if ($ctrl.certain_amount.bonus_mb === 0) $ctrl.selected = 'time'
       }).catch(CatchHttpError)
     }
-
-    $ctrl.selectChange = () => {
-      $ctrl.optionIsRequired = false
-
-      if ($ctrl.certain_amount.bonus_limit_days === 'today') {
-        $ctrl.certain_amount.bonus_from_date = moment().startOf('day').toDate()
-        $ctrl.certain_amount.bonus_to_date = moment().endOf('day').toDate()
-      } else if ($ctrl.certain_amount.bonus_limit_days === '1_week') {
-        $ctrl.certain_amount.bonus_from_date = moment().startOf('day').toDate()
-        $ctrl.certain_amount.bonus_to_date = moment().add(6, 'day').endOf('day').toDate()
-      } else if ($ctrl.certain_amount.bonus_limit_days === '2_weeks') {
-        $ctrl.certain_amount.bonus_from_date = moment().startOf('day').toDate()
-        $ctrl.certain_amount.bonus_to_date = moment().add(13, 'day').endOf('day').toDate()
-      } else if ($ctrl.certain_amount.bonus_limit_days === '1_month') {
-        $ctrl.certain_amount.bonus_from_date = moment().startOf('day').toDate()
-        $ctrl.certain_amount.bonus_to_date = moment().add(29, 'day').endOf('day').toDate()
-      }
-    }
     $ctrl.update = () => {
       var certain_amount = $ctrl.certain_amount
       if ($ctrl.selected === 'data') certain_amount.bonus_minutes = 0
       else if ($ctrl.selected === 'time') certain_amount.bonus_mb = 0
       $ctrl.settings.certain_amount = certain_amount
 
-      $http.post('/bonus-plugin', $ctrl.settings).then(SettingsSavedToastr).catch(CatchHttpError)
+      $http.post('/bonus-plugin-settings', $ctrl.settings).then(SettingsSavedToastr).catch(CatchHttpError)
     }
 
     load()

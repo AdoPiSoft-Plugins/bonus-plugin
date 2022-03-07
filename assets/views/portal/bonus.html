@@ -1,0 +1,128 @@
+<style>
+  .bonus-plugin .bonus-main-icon{
+    position: fixed;
+    color: #0183FF;
+    opacity:0.9;
+    text-decoration: none;
+    width:auto;
+    height:auto;
+    right:18px;
+    bottom: 10%;
+    z-index: 99999;
+    align-self: flex-end;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    transform-origin: bottom;
+    display: none;
+  }
+  .bonus-main-icon{
+    animation-name: bonus-main-icon;
+    animation-timing-function: ease;
+     opacity: 0.6
+  }
+  .bonus-main-icon .bonus-icon {
+    width: 55px;
+  }
+  
+ @keyframes bonus-main-icon {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+  }
+  .bonus-plugin .bonus-main-icon:hover{
+    opacity: 1 !important;
+  }
+
+  .bonus-plugin .bonus-container{
+    display: none;
+    position: fixed;
+    right: 2px;
+    bottom: 10%;
+    box-shadow: 2px 10px 18px 2px grey;
+    border-radius: 5px;
+    z-index: 99999999;
+    background: rgba(0, 0, 0, 0.91);
+    color: white;
+    border: 1px solid black;
+    padding-top: 10px;
+    height: 400px;
+    width: 400px;
+  }
+
+  .bonus-plugin .bonus-list, .bonus-plugin .loading{
+    margin-top: 10px;
+    padding: 20px 10px;
+    background: white;
+    color: black;
+    height: 92%;
+  }
+  .bonus-plugin .bonus-list {
+    display: none;
+    padding: 20px 0px;
+  }
+  .bonus-list ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  .bonus-list ul li {
+    display: inline;
+    padding: 10px 5px;
+    cursor: pointer;
+  }
+  .bonus-list ul li a {
+    text-decoration: none;
+    margin-right: 10px;
+
+  }
+  .tab-content {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background: #F9F8F8;
+    height: 97%;
+    overflow-y: auto;
+
+  }
+  .bonus-list ul .rewards {
+    border-bottom: 3px solid #920092;
+    font-weight: bold;
+  }
+
+  @media (max-width:  500px){
+    .bonus-plugin .bonus-container{
+      width: 100%;
+    }
+  }
+
+</style>
+
+<div class="bonus-plugin">
+  <a href="javascript:void(0)" onclick="openBonus()" class="bonus-main-icon">
+    <img class="bonus-icon" alt="" src="/public/plugins/bonus-plugin/images/gift-icon.png">
+  </a>
+  <div class="bonus-container"
+  >
+   <a onclick="closeBonus()" href="javascript:void(0)" class='close'>
+      <i class="fa fa-close" style="color:white;">&nbsp;</i>
+    </a>
+    <h4 class="text-center"><strong>Bonus</strong></h4>
+    <div class="loading">Loading, please wait ...</div>
+    <div class="bonus-list">
+      <ul>  
+        <li class="rewards" onclick="tabClick(1)">
+          <a>Rewards</a>
+        </li>
+        <li class="challenges" onclick="tabClick(2)">
+          <a>Challenges</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="rewards-div">
+          
+        </div>
+        <div class="challenges-div" style="display: none; margin: 0; padding: 0;">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

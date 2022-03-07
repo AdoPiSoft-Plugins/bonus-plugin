@@ -2,7 +2,7 @@ angular.module('Plugins')
   .controller('BonusCtrl', function ($http,$scope, SettingsSavedToastr, CatchHttpError) {
 
     function load () {
-      $http.get('/bonus-plugin').then(res => {
+      $http.get('/bonus-plugin-settings').then(res => {
         $scope.settings = res.data
       }).catch(e => {
         CatchHttpError(e)
@@ -11,7 +11,7 @@ angular.module('Plugins')
 
     $scope.$watch('settings.enable_bonus', function (val, oldVal) {
       if (val == null || oldVal === null || oldVal === undefined) return
-      $http.post('/bonus-plugin',  $scope.settings).then(SettingsSavedToastr).catch(CatchHttpError)
+      $http.post('/bonus-plugin-settings',  $scope.settings).then(SettingsSavedToastr).catch(CatchHttpError)
     })
 
     load()

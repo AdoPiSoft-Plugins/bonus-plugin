@@ -3,11 +3,10 @@
   <form class="padd-top" name="certainAmountForm" ng-submit="$ctrl.update()">
     <div class="form-group" ng-class="{'has-error': $ctrl.optionIsRequired, 'has-success': !$ctrl.optionIsRequired}">
       <label class="control-label">How long do the customer must pay?</label>
-      <select class="form-control" ng-model="$ctrl.certain_amount.bonus_limit_days" ng-change="$ctrl.selectChange()">
+      <select class="form-control" ng-model="$ctrl.certain_amount.bonus_limit_days" ng-change="$ctrl.optionIsRequired = false">
         <option value="today">Today</option>
-        <option value="1_week">1 Week</option>
-        <option value="2_weeks">2 Weeks</option>
-        <option value="1_month">1 Month</option>
+        <option value="this_week">This Week</option>
+        <option value="this_month">This Month</option>
       </select>
       <span class="help-block" ng-if="$ctrl.optionIsRequired">It is required</span>
     </div>
@@ -31,7 +30,7 @@
       </div>
     </div>
     <div class="form-group" ng-if="$ctrl.selected === 'time'" ng-class="{'has-error': certainAmountForm.bonus_minutes.$invalid, 'has-success': certainAmountForm.bonus_minutes.$valid && certainAmountForm.bonus_minutes.$touched}">
-      <label class="control-label">Time:</label>
+      <label class="control-label">Time (min):</label>
       <input type="number" name="bonus_minutes" required class="form-control" ng-model="$ctrl.certain_amount.bonus_minutes" min="1"> 
        <span class="help-block" ng-if="certainAmountForm.bonus_minutes.$error.required">
         It is required
@@ -41,7 +40,7 @@
       </span>
     </div>
     <div class="form-group" ng-if="$ctrl.selected === 'data'" ng-class="{'has-error': certainAmountForm.bonus_mb.$invalid, 'has-success': certainAmountForm.bonus_mb.$valid && certainAmountForm.bonus_mb.$touched}">
-      <label class="control-label">Data:</label>
+      <label class="control-label">Data (MB):</label>
       <input type="number" name="bonus_mb" required class="form-control" ng-model="$ctrl.certain_amount.bonus_mb" min="1"> 
       <span class="help-block" ng-if="certainAmountForm.bonus_mb.$error.required">
         It is required
