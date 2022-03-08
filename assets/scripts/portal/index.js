@@ -43,17 +43,12 @@ function httpPost (url, params, cb) {
 }
 
 function openBonus() {
-  if (fetchedData.config && !fetchedData.config.enable_bonus) {
-    alert('Plugin is disabled.')
-    window.location.reload()
-  } else {
-    document.querySelector('.bonus-main-icon').style = 'display: none'
-    document.querySelector('.bonus-container').style = 'display: block'
+  document.querySelector('.bonus-main-icon').style = 'display: none'
+  document.querySelector('.bonus-container').style = 'display: block'
 
-    initBonusSettings(function () {
-      document.querySelector('.tab-content').style = 'display: block'
-    })
-  }
+  initBonusSettings(function () {
+    document.querySelector('.tab-content').style = 'display: block'
+  })
 }
 
 function closeBonus () {
@@ -146,26 +141,36 @@ function initBonusSettings (cb) {
   const bonus_list = document.querySelector('.bonus-list')
   const no_reward = document.createElement('p')
   const rewards_div = document.querySelector('.rewards-div')
+  const disabled_bonus_div = document.querySelector('.disabled-bonus')
 
   no_reward.className = 'text-danger'
-  loading_div.style = 'display: block'
+  loading_div.style = 'display: block; padding-left: 10px'
   bonus_list.style.display = 'none'
+  disabled_bonus_div.style = 'display: none'
 
   httpGet(getAllBonusUrl, function (data) {
     fetchedData = JSON.parse(data)
     loading_div.style.display = 'none'
-    bonus_list.style.display = 'block'
 
-    if (rewards_div) {
-      rewards_div.innerHTML = ''
+    if(!fetchedData.config.enable_bonus){
+      disabled_bonus_div.style = 'display: block'
+      bonus_list.style.display = 'none'
+    }else{
+      disabled_bonus_div.style = 'display: none'
+      bonus_list.style.display = 'block'
+      if (rewards_div) {
+        rewards_div.innerHTML = ''
+      }
+
+      if (fetchedData.bonus && fetchedData.bonus.length > 0) {
+        createTable(fetchedData.bonus)
+      } else {
+        no_reward.innerText = 'No rewards yet.'
+        rewards_div.append(no_reward)
+      }      
     }
 
-    if (fetchedData.bonus && fetchedData.bonus.length > 0) {
-      createTable(fetchedData.bonus)
-    } else {
-      no_reward.innerText = 'No rewards yet.'
-      rewards_div.append(no_reward)
-    }
+    
 
     if (cb) cb(fetchedData)
   })
@@ -178,7 +183,7 @@ function collect (bonus, btn) {
     btn.textContent = 'Collect'
     btn.disabled = false
     if (data.error) {
-      alert(data.error + ', please refresh the page.')
+      alert(data.error)
     }
     initBonusSettings()
     closeBonus()
@@ -242,13 +247,4 @@ function tabClick (i) {
       })
     }
   }, 1e3)
-
-  var i = setInterval(() => {
-    initBonusSettings(function () {
-      if (fetchedData.config && fetchedData.config.enable_bonus) {
-        document.querySelector('.bonus-main-icon').style = 'display: block'
-      }
-      clearInterval(i)
-    })
-  }, 2e3)
 })()

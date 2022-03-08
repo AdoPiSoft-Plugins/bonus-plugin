@@ -16,7 +16,7 @@ exports.collect = async (req, res, next) => {
     const params = req.body
     const cfg = await config.read()
     if (!cfg.enable_bonus) {
-      return res.json({error: 'Plugin is disabled by the administrator'})
+      return res.json({error: 'Bonus is temporarily disabled by the administrator.'})
     }
     await bonus_sessions.collect(params, req.device)
     res.json({success: true})

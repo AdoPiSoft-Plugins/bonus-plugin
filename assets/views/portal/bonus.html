@@ -13,7 +13,7 @@
     animation-duration: 2s;
     animation-iteration-count: infinite;
     transform-origin: bottom;
-    display: none;
+    display: block;
   }
   .bonus-main-icon{
     animation-name: bonus-main-icon;
@@ -51,14 +51,25 @@
 
   .bonus-plugin .bonus-list, .bonus-plugin .loading{
     margin-top: 10px;
-    padding: 20px 10px;
+    padding: 20px 0px;
     background: white;
     color: black;
     height: 92%;
   }
-  .bonus-plugin .bonus-list {
+  .bonus-plugin .disabled-bonus{
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+    color: black;
+    height: 92%;
     display: none;
-    padding: 20px 0px;
+  }
+  .disabled-bonus .disabled-bonus-div h4{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
   }
   .bonus-list ul {
     list-style-type: none;
@@ -79,7 +90,7 @@
     margin-top: 10px;
     padding: 10px 15px;
     background: #F9F8F8;
-    height: 97%;
+    height: 96%;
     overflow-y: auto;
 
   }
@@ -122,6 +133,11 @@
         </div>
         <div class="challenges-div" style="display: none; margin: 0; padding: 0;">
         </div>
+      </div>
+    </div>
+    <div class="disabled-bonus">
+      <div class="disabled-bonus-div">
+        <h4 class="text-center">Bonus is temporarily disabled by the administrator.</h4>
       </div>
     </div>
   </div>
