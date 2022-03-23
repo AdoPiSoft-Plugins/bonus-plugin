@@ -10,7 +10,7 @@ exports.load = async (device) => {
   if (enable_bonus) {
     //for certain amount challenge only
     if (certain_amount) {
-      exports.setTime(certain_amount)
+      exports.setDate(certain_amount)
 
       const {bonus_amount_needed, bonus_mb, bonus_minutes} = certain_amount
       const total_amount = await exports.findTotalAmount(device.db_instance.id)
@@ -69,7 +69,7 @@ exports.list = async (device_id) => {
   return bonus_sessions.map(item => item)
 }
 
-exports.setTime = (certain_amount) => {
+exports.setDate = (certain_amount) => {
   const {bonus_limit_days} = certain_amount
   if (bonus_limit_days === 'today') {
     exports.from_date = moment().startOf('day').toDate()
