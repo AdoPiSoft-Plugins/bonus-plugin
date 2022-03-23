@@ -14,9 +14,9 @@ exports.update = async (req, res, next) => {
   try {
     const prev_cfg = await config.read()
     const params = req.body
-
+    console.log(params)
     if (prev_cfg.certain_amount) {
-      if (prev_cfg.certain_amount.bonus_limit_days !== params.bonus_limit_days) {
+      if (prev_cfg.certain_amount.bonus_limit_days !== params.certain_amount.bonus_limit_days) {
         await bonus_sessions.deleteAllCertainAmount()
       }
     }
