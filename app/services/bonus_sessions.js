@@ -10,7 +10,7 @@ exports.load = async (device) => {
   if (enable_bonus) {
     //for certain amount challenge only
     if (certain_amount) {
-      exports.setTime(certain_amount)
+      exports.setDate(certain_amount)
 
       const {bonus_amount_needed, bonus_mb, bonus_minutes} = certain_amount
       const total_amount = await exports.findTotalAmount(device.db_instance.id)
@@ -24,7 +24,7 @@ exports.load = async (device) => {
       })
       //destory bonus_session if activated after the limitation date
       await exist_sessions.map(async s => {
-        const is_true = moment(exports.to_date).startOf('day').toDate() > moment(s.created_at).endOf('day').toDate() || false
+        const is_true = moment(exports.from_date).startOf('day').toDate() > moment(s.created_at).endOf('day').toDate() || false
         if (s.is_activated && is_true) {
           await s.destroy()
         }
@@ -69,7 +69,17 @@ exports.list = async (device_id) => {
   return bonus_sessions.map(item => item)
 }
 
-exports.setTime = (certain_amount) => {
+exports.deleteAllCertainAmount = async () => {
+  const {models} = await db.getInstance()
+  const allBonus = await models.BonusSession.findAll({
+    where: { type: 'certain_amount', is_activated: false}
+  })
+  for (const b in allBonus) {
+    await allBonus[b].destroy()
+  }
+}
+
+exports.setDate = (certain_amount) => {
   const {bonus_limit_days} = certain_amount
   if (bonus_limit_days === 'today') {
     exports.from_date = moment().startOf('day').toDate()
