@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING
     },
     mobile_device_id: {
-      type: Sequelize.UUID
+      type: Sequelize.INTEGER
     },
     type: {
       type: Sequelize.STRING

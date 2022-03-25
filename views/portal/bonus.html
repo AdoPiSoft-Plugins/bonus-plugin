@@ -1,12 +1,12 @@
 <style>
-  .bonus-plugin .bonus-main-icon{
+  .bonus-plugin .bonus-main-icon {
     position: fixed;
     color: #0183FF;
-    opacity:0.9;
+    opacity: 0.9;
     text-decoration: none;
-    width:auto;
-    height:auto;
-    right:18px;
+    width: auto;
+    height: auto;
+    right: 18px;
     bottom: 10%;
     z-index: 99999;
     align-self: flex-end;
@@ -15,25 +15,36 @@
     transform-origin: bottom;
     display: block;
   }
-  .bonus-main-icon{
+
+  .bonus-main-icon {
     animation-name: bonus-main-icon;
     animation-timing-function: ease;
-     opacity: 0.6
+    opacity: 0.6
   }
+
   .bonus-main-icon .bonus-icon {
     width: 55px;
   }
-  
- @keyframes bonus-main-icon {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(-20px); }
-    100% { transform: translateY(0); }
+
+  @keyframes bonus-main-icon {
+    0% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+
+    100% {
+      transform: translateY(0);
+    }
   }
-  .bonus-plugin .bonus-main-icon:hover{
+
+  .bonus-plugin .bonus-main-icon:hover {
     opacity: 1 !important;
   }
 
-  .bonus-plugin .bonus-container{
+  .bonus-plugin .bonus-container {
     display: none;
     position: fixed;
     right: 2px;
@@ -49,14 +60,16 @@
     width: 400px;
   }
 
-  .bonus-plugin .bonus-list, .bonus-plugin .loading{
+  .bonus-plugin .bonus-list,
+  .bonus-plugin .loading {
     margin-top: 10px;
     padding: 20px 0px;
     background: white;
     color: black;
     height: 92%;
   }
-  .bonus-plugin .disabled-bonus{
+
+  .bonus-plugin .disabled-bonus {
     margin-top: 10px;
     padding: 10px;
     background: white;
@@ -64,28 +77,33 @@
     height: 92%;
     display: none;
   }
-  .disabled-bonus .disabled-bonus-div h4{
+
+  .disabled-bonus .disabled-bonus-div h4 {
     margin: 0;
     position: absolute;
     top: 50%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
   }
+
   .bonus-list ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
   }
+
   .bonus-list ul li {
     display: inline;
     padding: 10px 5px;
     cursor: pointer;
   }
+
   .bonus-list ul li a {
     text-decoration: none;
     margin-right: 10px;
 
   }
+
   .tab-content {
     margin-top: 10px;
     padding: 10px 15px;
@@ -94,32 +112,31 @@
     overflow-y: auto;
 
   }
+
   .bonus-list ul .rewards {
     border-bottom: 3px solid #920092;
     font-weight: bold;
   }
 
-  @media (max-width:  500px){
-    .bonus-plugin .bonus-container{
+  @media (max-width: 500px) {
+    .bonus-plugin .bonus-container {
       width: 100%;
     }
   }
-
 </style>
 
 <div class="bonus-plugin">
   <a href="javascript:void(0)" onclick="openBonus()" class="bonus-main-icon">
-    <img class="bonus-icon" alt="" src="/public/plugins/bonus-plugin/images/gift-icon.png">
+    <img class="bonus-icon" alt="" src="/plugins/bonus-plugin/assets/images/gift-icon.png">
   </a>
-  <div class="bonus-container"
-  >
-   <a onclick="closeBonus()" href="javascript:void(0)" class='close'>
+  <div class="bonus-container">
+    <a onclick="closeBonus()" href="javascript:void(0)" class='close'>
       <i class="fa fa-close" style="color:white;">&nbsp;</i>
     </a>
     <h4 class="text-center"><strong>Bonus</strong></h4>
     <div class="loading">Loading, please wait ...</div>
     <div class="bonus-list">
-      <ul>  
+      <ul>
         <li class="rewards" onclick="tabClick(1)">
           <a>Rewards</a>
         </li>
@@ -129,7 +146,7 @@
       </ul>
       <div class="tab-content">
         <div class="rewards-div">
-          
+
         </div>
         <div class="challenges-div" style="display: none; margin: 0; padding: 0;">
         </div>

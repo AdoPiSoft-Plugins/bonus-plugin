@@ -1,7 +1,6 @@
 'use strict'
 
-const core_models = require('@adopisoft/core/models')
-const {machine} = require('@adopisoft/exports')
+const {dbi, machine_id} = require('../../core.js')
 const BonusSession = require('./bonus_session_model.js')
 
 const model_files = {
@@ -9,14 +8,25 @@ const model_files = {
 }
 
 exports.init = async () => {
-  const {sequelize, models, Sequelize} = await core_models.getInstance()
+  if (!dbi) return
+  const {
+    sequelize,
+    Sequelize,
+    models
+  } = dbi
+
   const db = await sequelize.getInstance()
-  const machine_id = await machine.getId()
 
   var keys = Object.keys(model_files)
   for (var i = 0; i < keys.length; i++) {
     var k = keys[i]
     models[k] = model_files[k](db, Sequelize)
+
+    try {
+      await models[k].sync({
+        alter: true
+      })
+    } catch (e) {}
   }
 
   var default_scope = {
@@ -27,5 +37,5 @@ exports.init = async () => {
   models.BonusSession.belongsTo(models.MobileDevice)
   models.MobileDevice.hasMany(models.BonusSession)
 
-  return {sequelize, Sequelize, models}
+  return dbi
 }

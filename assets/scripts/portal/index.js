@@ -6,13 +6,13 @@ var fetchedData = []
 function httpGet (url, cb) {
   var xmlhttp
   if (window.XMLHttpRequest) {
-    xmlhttp = new XMLHttpRequest
+    xmlhttp = new XMLHttpRequest()
   } else {
     xmlhttp = new ActiveXObject('Microsoft.XMLHTTP')
   }
 
   xmlhttp.onreadystatechange = function () {
-    if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
       if (cb) cb(xmlhttp.responseText)
     }
   }
@@ -24,7 +24,7 @@ function httpGet (url, cb) {
 function httpPost (url, params, cb) {
   var xmlhttp
   if (window.XMLHttpRequest) {
-    xmlhttp = new XMLHttpRequest
+    xmlhttp = new XMLHttpRequest()
   } else {
     xmlhttp = new ActiveXObject('Microsoft.XMLHTTP')
   }
@@ -42,7 +42,7 @@ function httpPost (url, params, cb) {
   xmlhttp.send(JSON.stringify(params || {}))
 }
 
-function openBonus() {
+function openBonus () {
   document.querySelector('.bonus-main-icon').style = 'display: none'
   document.querySelector('.bonus-container').style = 'display: block'
 
@@ -152,10 +152,10 @@ function initBonusSettings (cb) {
     fetchedData = JSON.parse(data)
     loading_div.style.display = 'none'
 
-    if(!fetchedData.config.enable_bonus){
+    if (!fetchedData.config.enable_bonus) {
       disabled_bonus_div.style = 'display: block'
       bonus_list.style.display = 'none'
-    }else{
+    } else {
       disabled_bonus_div.style = 'display: none'
       bonus_list.style.display = 'block'
       if (rewards_div) {
@@ -167,10 +167,8 @@ function initBonusSettings (cb) {
       } else {
         no_reward.innerText = 'No rewards yet.'
         rewards_div.append(no_reward)
-      }      
+      }
     }
-
-    
 
     if (cb) cb(fetchedData)
   })
@@ -192,19 +190,15 @@ function collect (bonus, btn) {
 
 function setChallenges (challenges_div) {
   let challenges = []
-  const challenges_type = ['certain_amount']
   challenges_div.innerHTML = ''
   const config = fetchedData.config
 
-  for (const item of challenges_type) {
-    if (config && config.hasOwnProperty(item)) {
-      if (item === 'certain_amount') {
-        const text = `If you reach the amount ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')},
-        you'll get free ${config.certain_amount.bonus_mb ? config.certain_amount.bonus_mb + ' MB' : convertCredits(config.certain_amount.bonus_minutes) } bonus session.`
-        challenges.push(text)
-      }
-    }
+  if (config.bonus_type === 'certain_amount') {
+    const text = `If you reach the amount ${config.bonus_amount_needed} pesos within ${(config.bonus_limit_days).replace('_', ' ')},
+    you'll get free ${config.bonus_mb ? config.bonus_mb + ' MB' : convertCredits(config.bonus_minutes)} bonus session.`
+    challenges.push(text)
   }
+
   for (const item of challenges) {
     const index = challenges.indexOf(item) + 1
     const p = document.createElement('p')
@@ -240,7 +234,7 @@ function tabClick (i) {
     if (!document.getElementById('bonus-plugin')) {
       var bonus_plugin = document.createElement('div')
       bonus_plugin.id = 'bonus-plugin'
-      httpGet('/public/plugins/bonus-plugin/views/portal/bonus.html?href=' + (new Date()).getMonth(), function (html) {
+      httpGet('/plugins/bonus-plugin/views/portal/bonus.html?href=' + (new Date()).getMonth(), function (html) {
         bonus_plugin.innerHTML = html
         var body = document.querySelector('body')
         body.append(bonus_plugin)

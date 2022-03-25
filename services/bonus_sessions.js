@@ -1,30 +1,28 @@
-const {machine, sessions_manager} = require('@adopisoft/exports')
-const cfg = require('../config.js')
+const core = require('../../core.js')
+const {machine_id, dbi, sessions_manager, plugin_config} = core
+
+const config = require('../config.js')
 const moment = require('moment')
-const db = require('@adopisoft/core/models')
 
 exports.load = async (device) => {
-  const {models, Sequelize} = await db.getInstance()
+  const {models, Sequelize} = dbi
   const {Op} = Sequelize
-  const {enable_bonus, certain_amount} = await cfg.read()
+  const {bonus_type, enable_bonus, bonus_limit_days, bonus_amount_needed, bonus_mb, bonus_minutes} = await exports.getConfig()
   if (enable_bonus) {
     //for certain amount challenge only
-    if (certain_amount) {
-      exports.setTime(certain_amount)
-
-      const {bonus_amount_needed, bonus_mb, bonus_minutes} = certain_amount
+    if (bonus_type === 'certain_amount') {
+      exports.setDate(bonus_limit_days)
       const total_amount = await exports.findTotalAmount(device.db_instance.id)
-      const machine_id = await machine.getId()
 
       const exist_sessions = await models.BonusSession.findAll({
         where: {
           mobile_device_id: device.db_instance.id,
-          type: 'certain_amount'
+          type: bonus_type
         }
       })
-      //destory bonus_session if activated after the limitation date
+      //destory activated bonus_session after the limitation date
       await exist_sessions.map(async s => {
-        const is_true = moment(exports.to_date).startOf('day').toDate() > moment(s.created_at).endOf('day').toDate() || false
+        const is_true = moment(exports.from_date).startOf('day').toDate() > moment(s.created_at).endOf('day').toDate()
         if (s.is_activated && is_true) {
           await s.destroy()
         }
@@ -34,7 +32,7 @@ exports.load = async (device) => {
         const is_exist = await models.BonusSession.findOne({
           where: {
             mobile_device_id: device.db_instance.id,
-            type: 'certain_amount',
+            type: bonus_type,
             created_at: {
               [Op.gte]: exports.from_date,
               [Op.lte]: exports.to_date
@@ -45,7 +43,7 @@ exports.load = async (device) => {
         if (!is_exist) {
           await models.BonusSession.create({
             machine_id,
-            type: 'certain_amount',
+            type: bonus_type,
             mobile_device_id: device.db_instance.id,
             bonus_mb,
             bonus_minutes
@@ -57,8 +55,17 @@ exports.load = async (device) => {
   }
 }
 
+exports.deleteAllCertainAmountBonus = async () => {
+  const allBonus = await dbi.models.BonusSession.findAll({
+    where: { type: 'certain_amount', is_activated: false}
+  })
+  for (const b in allBonus) {
+    await allBonus[b].destroy()
+  }
+}
+
 exports.list = async (device_id) => {
-  const {models} = await db.getInstance()
+  const {models} = dbi
   const bonus_sessions = await models.BonusSession.findAll({
     where: {
       mobile_device_id: device_id,
@@ -69,8 +76,7 @@ exports.list = async (device_id) => {
   return bonus_sessions.map(item => item)
 }
 
-exports.setTime = (certain_amount) => {
-  const {bonus_limit_days} = certain_amount
+exports.setDate = (bonus_limit_days) => {
   if (bonus_limit_days === 'today') {
     exports.from_date = moment().startOf('day').toDate()
     exports.to_date = moment().endOf('day').toDate()
@@ -84,9 +90,8 @@ exports.setTime = (certain_amount) => {
 }
 
 exports.findTotalAmount = async (id) => {
-  const {models, Sequelize} = await db.getInstance()
+  const {models, Sequelize} = dbi
   const {Op} = Sequelize
-
   const sum = await models.Transaction.scope(['default_scope']).sum('amount', {
     where: {
       mobile_device_id: id,
@@ -102,9 +107,8 @@ exports.findTotalAmount = async (id) => {
 }
 
 exports.collect = async (params, device) => {
-  const {models} = await db.getInstance()
+  const {models} = dbi
   const {bonus_mb, bonus_minutes, id, mobile_device_id} = params
-
   const type = bonus_mb > 0 && bonus_minutes > 0
     ? 'time_or_data'
     : bonus_mb > 0
@@ -130,4 +134,16 @@ exports.collect = async (params, device) => {
       }
     })
   }
+}
+
+exports.getConfig = async () => {
+  const {plugins} = await plugin_config.read()
+  let cfg = plugins.find(p => p.id === config.id)
+  if (cfg.bonus_type === 'certain_amount') {
+    cfg.bonus_amount_needed = parseInt(cfg.bonus_amount_needed)
+    cfg.bonus_mb = parseInt(cfg.bonus_mb)
+    cfg.bonus_minutes = parseInt(cfg.bonus_minutes)
+  }
+
+  return cfg
 }
