@@ -12,17 +12,18 @@
         $ctrl.settings = res.data
         $ctrl.config = $ctrl.settings
 
-        $ctrl.optionIsRequired = !$ctrl.config.bonus_limit_days
+        $ctrl.optionIsRequired = !$ctrl.config.certain_amount.bonus_limit_days
 
-        if ($ctrl.config.bonus_minutes === 0) $ctrl.selected = 'data'
-        if ($ctrl.config.bonus_mb === 0) $ctrl.selected = 'time'
+        if ($ctrl.config.certain_amount.bonus_minutes === 0) $ctrl.selected = 'data'
+        if ($ctrl.config.certain_amount.bonus_mb === 0) $ctrl.selected = 'time'
       }).catch(CatchHttpError)
     }
     $ctrl.update = () => {
       var config = $ctrl.config
-      if ($ctrl.selected === 'data') config.bonus_minutes = 0
-      else if ($ctrl.selected === 'time') config.bonus_mb = 0
-      config.bonus_type = 'certain_amount'
+
+      if ($ctrl.selected === 'data') config.certain_amount.bonus_minutes = 0
+      else if ($ctrl.selected === 'time') config.certain_amount.bonus_mb = 0
+        
       $ctrl.settings = config
 
       $http.post('/bonus-plugin-settings', $ctrl.settings).then(SettingsSavedToastr).catch(CatchHttpError)

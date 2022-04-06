@@ -4,7 +4,7 @@
   <form class="padd-top" name="certainAmountForm" ng-submit="$ctrl.update()">
     <div class="form-group" ng-class="{'has-error': $ctrl.optionIsRequired, 'has-success': !$ctrl.optionIsRequired}">
       <label class="control-label">How long do the customer must pay?</label>
-      <select class="form-control" ng-model="$ctrl.config.bonus_limit_days" ng-change="$ctrl.optionIsRequired = false">
+      <select class="form-control" ng-model="$ctrl.config.certain_amount.bonus_limit_days" ng-change="$ctrl.optionIsRequired = false">
         <option value="today">Today</option>
         <option value="this_week">This Week</option>
         <option value="this_month">This Month</option>
@@ -14,7 +14,7 @@
     <div class="form-group"
       ng-class="{'has-error': certainAmountForm.bonus_amount_needed.$invalid, 'has-success': certainAmountForm.bonus_amount_needed.$valid && certainAmountForm.bonus_amount_needed.$touched}">
       <label class="control-label">How much do the customer must pay?</label>
-      <input type="number" name="bonus_amount_needed" ng-model="$ctrl.config.bonus_amount_needed" class="form-control"
+      <input type="number" name="bonus_amount_needed" ng-model="$ctrl.config.certain_amount.bonus_amount_needed" class="form-control"
         min="100" required>
       <span class="help-block" ng-if="certainAmountForm.bonus_amount_needed.$error.required">It is required</span>
       <span class="help-block" ng-if="certainAmountForm.bonus_amount_needed.$error.min">
@@ -35,7 +35,7 @@
     <div class="form-group" ng-if="$ctrl.selected === 'time'"
       ng-class="{'has-error': certainAmountForm.bonus_minutes.$invalid, 'has-success': certainAmountForm.bonus_minutes.$valid && certainAmountForm.bonus_minutes.$touched}">
       <label class="control-label">Time (min):</label>
-      <input type="number" name="bonus_minutes" required class="form-control" ng-model="$ctrl.config.bonus_minutes"
+      <input type="number" name="bonus_minutes" required class="form-control" ng-model="$ctrl.config.certain_amount.bonus_minutes"
         min="1">
       <span class="help-block" ng-if="certainAmountForm.bonus_minutes.$error.required">
         It is required
@@ -47,7 +47,7 @@
     <div class="form-group" ng-if="$ctrl.selected === 'data'"
       ng-class="{'has-error': certainAmountForm.bonus_mb.$invalid, 'has-success': certainAmountForm.bonus_mb.$valid && certainAmountForm.bonus_mb.$touched}">
       <label class="control-label">Data (MB):</label>
-      <input type="number" name="bonus_mb" required class="form-control" ng-model="$ctrl.config.bonus_mb" min="1">
+      <input type="number" name="bonus_mb" required class="form-control" ng-model="$ctrl.config.certain_amount.bonus_mb" min="1">
       <span class="help-block" ng-if="certainAmountForm.bonus_mb.$error.required">
         It is required
       </span>

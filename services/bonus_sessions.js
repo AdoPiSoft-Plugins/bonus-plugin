@@ -7,11 +7,14 @@ const moment = require('moment')
 exports.load = async (device) => {
   const {models, Sequelize} = dbi
   const {Op} = Sequelize
-  const {bonus_type, enable_bonus, bonus_limit_days, bonus_amount_needed, bonus_mb, bonus_minutes} = await exports.getConfig()
+  const {enable_bonus, certain_amount} = await config.read()
   if (enable_bonus) {
     //for certain amount challenge only
-    if (bonus_type === 'certain_amount') {
+    if (certain_amount) {
+      const bonus_type = 'certain_amount'
+      const { bonus_limit_days, bonus_amount_needed, bonus_mb, bonus_minutes } = certain_amount
       exports.setDate(bonus_limit_days)
+
       const total_amount = await exports.findTotalAmount(device.db_instance.id)
 
       const exist_sessions = await models.BonusSession.findAll({
@@ -134,16 +137,4 @@ exports.collect = async (params, device) => {
       }
     })
   }
-}
-
-exports.getConfig = async () => {
-  const {plugins} = await plugin_config.read()
-  let cfg = plugins.find(p => p.id === config.id)
-  if (cfg.bonus_type === 'certain_amount') {
-    cfg.bonus_amount_needed = parseInt(cfg.bonus_amount_needed)
-    cfg.bonus_mb = parseInt(cfg.bonus_mb)
-    cfg.bonus_minutes = parseInt(cfg.bonus_minutes)
-  }
-
-  return cfg
 }

@@ -190,13 +190,19 @@ function collect (bonus, btn) {
 
 function setChallenges (challenges_div) {
   let challenges = []
+
+  const challenges_type = ['certain_amount']
   challenges_div.innerHTML = ''
   const config = fetchedData.config
 
-  if (config.bonus_type === 'certain_amount') {
-    const text = `If you reach the amount ${config.bonus_amount_needed} pesos within ${(config.bonus_limit_days).replace('_', ' ')},
-    you'll get free ${config.bonus_mb ? config.bonus_mb + ' MB' : convertCredits(config.bonus_minutes)} bonus session.`
-    challenges.push(text)
+  for (const item of challenges_type) {
+    if (config && config.hasOwnProperty(item)) {
+      if (item === 'certain_amount') {
+        const text = `If you reach the amount ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')},
+        you'll get free ${config.certain_amount.bonus_mb ? config.certain_amount.bonus_mb + ' MB' : convertCredits(config.certain_amount.bonus_minutes) } bonus session.`
+        challenges.push(text)
+      }
+    }
   }
 
   for (const item of challenges) {

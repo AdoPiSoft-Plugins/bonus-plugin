@@ -1,11 +1,9 @@
 const router = require('./router.js')
 const {app} = require('../core.js')
 const models = require('./models')
-const config = require('./config.js')
 
 module.exports = {
-  async init (id) {
-    config.id = id
+  async init () {
     await models.init()
     app.use(router)
   },
