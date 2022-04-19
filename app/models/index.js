@@ -3,9 +3,11 @@
 const core_models = require('@adopisoft/core/models')
 const {machine} = require('@adopisoft/exports')
 const BonusSession = require('./bonus_session_model.js')
+const RoletaUsers = require('./roleta_users.js')
 
 const model_files = {
-  BonusSession
+  BonusSession,
+  RoletaUsers
 }
 
 exports.init = async () => {
@@ -26,6 +28,8 @@ exports.init = async () => {
   models.BonusSession.addScope('default_scope', default_scope)
   models.BonusSession.belongsTo(models.MobileDevice)
   models.MobileDevice.hasMany(models.BonusSession)
+  models.RoletaUsers.addScope('default_scope', default_scope)
+  models.RoletaUsers.belongsTo(models.MobileDevice)
 
   return {sequelize, Sequelize, models}
 }

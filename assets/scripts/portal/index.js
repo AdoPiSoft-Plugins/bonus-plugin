@@ -1,18 +1,31 @@
 const getAllBonusUrl = '/bonus-plugin/portal/all'
 const collectUrl = '/bonus-plugin/portal/collect'
+const getSpinUrl = '/bonus-plugin/portal/roleta-game/spin-left'
+const updateRoletaUrl = '/bonus-plugin/portal/roleta-game/update'
+const addRoletaBonusUrl = '/bonus-plugin/portal/roleta-game/add-bonus'
+
+var roleta_spin_audio
+var roleta_win_audio
+var roleta_lose_audio
 
 var fetchedData = []
+var is_spinning = false
+var is_display_win_or_lose = false
+var spin_left = null
+var animation
+var is_playing = false
+var clicked_roleta = false
 
 function httpGet (url, cb) {
   var xmlhttp
   if (window.XMLHttpRequest) {
-    xmlhttp = new XMLHttpRequest
+    xmlhttp = new XMLHttpRequest()
   } else {
     xmlhttp = new ActiveXObject('Microsoft.XMLHTTP')
   }
 
   xmlhttp.onreadystatechange = function () {
-    if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
       if (cb) cb(xmlhttp.responseText)
     }
   }
@@ -24,7 +37,7 @@ function httpGet (url, cb) {
 function httpPost (url, params, cb) {
   var xmlhttp
   if (window.XMLHttpRequest) {
-    xmlhttp = new XMLHttpRequest
+    xmlhttp = new XMLHttpRequest()
   } else {
     xmlhttp = new ActiveXObject('Microsoft.XMLHTTP')
   }
@@ -42,7 +55,7 @@ function httpPost (url, params, cb) {
   xmlhttp.send(JSON.stringify(params || {}))
 }
 
-function openBonus() {
+function openBonus () {
   document.querySelector('.bonus-main-icon').style = 'display: none'
   document.querySelector('.bonus-container').style = 'display: block'
 
@@ -52,8 +65,12 @@ function openBonus() {
 }
 
 function closeBonus () {
-  document.querySelector('.bonus-main-icon').style = 'display: block'
-  document.querySelector('.bonus-container').style = 'display: none'
+  if (!is_spinning && !clicked_roleta) {
+    document.querySelector('.bonus-main-icon').style = 'display: block'
+    document.querySelector('.bonus-container').style = 'display: none'
+    tabClick(1)
+    closeRoleta()
+  }
 }
 
 function createTable () {
@@ -152,10 +169,10 @@ function initBonusSettings (cb) {
     fetchedData = JSON.parse(data)
     loading_div.style.display = 'none'
 
-    if(!fetchedData.config.enable_bonus){
+    if (!fetchedData.config.enable_bonus) {
       disabled_bonus_div.style = 'display: block'
       bonus_list.style.display = 'none'
-    }else{
+    } else {
       disabled_bonus_div.style = 'display: none'
       bonus_list.style.display = 'block'
       if (rewards_div) {
@@ -165,13 +182,11 @@ function initBonusSettings (cb) {
       if (fetchedData.bonus && fetchedData.bonus.length > 0) {
         createTable(fetchedData.bonus)
       } else {
+        no_reward.className = 'alert alert-danger'
         no_reward.innerText = 'No rewards yet.'
         rewards_div.append(no_reward)
-      }      
+      }
     }
-
-    
-
     if (cb) cb(fetchedData)
   })
 }
@@ -192,24 +207,35 @@ function collect (bonus, btn) {
 
 function setChallenges (challenges_div) {
   let challenges = []
-  const challenges_type = ['certain_amount']
+  const challenges_type = ['certain_amount', 'roleta_game']
   challenges_div.innerHTML = ''
   const config = fetchedData.config
 
   for (const item of challenges_type) {
     if (config && config.hasOwnProperty(item)) {
-      if (item === 'certain_amount') {
-        const text = `If you reach the amount ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')},
-        you'll get free ${config.certain_amount.bonus_mb ? config.certain_amount.bonus_mb + ' MB' : convertCredits(config.certain_amount.bonus_minutes) } bonus session.`
-        challenges.push(text)
+      if (item === 'certain_amount' && config.certain_amount.enable) {
+        const ct = `If you reach the amount ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')},
+        you'll get free ${config.certain_amount.bonus_mb ? config.certain_amount.bonus_mb + ' MB' : convertCredits(config.certain_amount.bonus_minutes)} bonus session.`
+        challenges.push(ct)
+      }
+      if (item === 'roleta_game' && config.roleta_game.enable && config.roleta_game.prizes.length > 2) {
+        const ct = `<span>Roleta Game. You can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Just click </span> <a onclick="initRoleta()">here.</a>`
+        challenges.push(ct)
       }
     }
   }
-  for (const item of challenges) {
-    const index = challenges.indexOf(item) + 1
+  if (challenges.length > 0) {
+    for (const item of challenges) {
+      const index = challenges.indexOf(item) + 1
+      const p = document.createElement('p')
+      p.className = 'p_element'
+      p.innerHTML = index + '. ' + item
+      challenges_div.append(p)
+    }
+  } else {
     const p = document.createElement('p')
-    p.className = 'p_element'
-    p.innerText = index + '. ' + item
+    p.className = 'alert alert-danger'
+    p.innerHTML = 'No challenges, contact admin to add challenges.'
     challenges_div.append(p)
   }
 }
@@ -219,19 +245,242 @@ function tabClick (i) {
   const rewards_div = document.querySelector('.rewards-div')
   const rewards_a = document.querySelector('.rewards')
   const challenges_a = document.querySelector('.challenges')
-
+  const refresh_btn = document.querySelector('#refresh-btn')
   if (i === 1) {
     rewards_div.style.display = 'block'
+    refresh_btn.style.display = 'block'
     challenges_div.style.display = 'none'
     rewards_a.style = 'font-weight: bold; border-bottom: 3px solid #920092;'
     challenges_a.style = 'font-weight: normal; border-bottom: none'
   } else if (i === 2) {
     rewards_div.style.display = 'none'
+    refresh_btn.style.display = 'none'
     challenges_div.style.display = 'block'
     challenges_a.style = 'font-weight: bold; border-bottom: 3px solid #920092;'
     rewards_a.style = 'font-weight: normal; border-bottom: none'
     setChallenges(challenges_div)
   }
+}
+
+function closeRoleta () {
+  if (!is_spinning) {
+    document.querySelector('.roleta-game').style = 'display: none'
+    document.querySelector('.bonus-list').style = 'display: block'
+    document.querySelector('.roleta-game').style = 'display: none'
+    document.querySelector('.win-or-lose-div').style = 'display: none'
+    is_display_win_or_lose = false
+    stopSound()
+    cancelAnimationFrame(animation)
+  }
+}
+
+function initRoleta () {
+  clicked_roleta = true
+  cancelAnimationFrame(animation)
+  document.querySelector('.loading').style = 'display: none'
+  document.querySelector('.bonus-list').style = 'display: none'
+  document.querySelector('.disabled-bonus').style = 'display: none'
+  document.querySelector('.roleta-game-main').style.display = 'none'
+  document.querySelector('.loading-roleta').style.display = 'block'
+  document.querySelector('.roleta-game').style = 'display: block'
+
+  httpGet(getAllBonusUrl, function (data) {
+    fetchedData = JSON.parse(data)
+    const {roleta_game} = fetchedData.config
+    const {spin_bg_sound, winner_sound, loser_sound} = roleta_game.sounds
+    roleta_spin_audio = setSound('spin', spin_bg_sound)
+    roleta_win_audio = setSound('win', winner_sound)
+    roleta_lose_audio = setSound('lose', loser_sound)
+
+    if (roleta_game && roleta_game.enable && roleta_game.prizes.length > 2) {
+      roletaGame(roleta_game)
+    } else {
+      window.alert('Ooops, this challenge is not available yet. Contact admin.')
+      window.location.reload()
+    }
+  })
+}
+
+function setSound (dir, file_name) {
+  const url = '/plugins/bonus-plugin/assets//sounds/' + dir + '/' + file_name
+  return new Howl({
+    src: [url],
+    loop: false,
+    buffer: false
+  })
+}
+
+function closePopPup () {
+  document.querySelector('.win-or-lose-div').style = 'display: none'
+  is_display_win_or_lose = false
+  stopSound()
+  initRoleta()
+}
+
+function stopSound () {
+  if (is_playing) {
+    roleta_spin_audio.stop()
+    roleta_win_audio.stop()
+    roleta_lose_audio.stop()
+    is_playing = false
+  }
+}
+
+function getSpinLeft () {
+  httpGet(getSpinUrl, function (data) {
+    data = JSON.parse(data)
+    spin_left = data.spin_left
+    document.querySelector('.spin-left').innerText = `Spin Left: ${spin_left}`
+    document.querySelector('.loading-roleta').style.display = 'none'
+    document.querySelector('.roleta-game-main').style.display = 'block'
+    clicked_roleta = false
+
+    if (spin_left <= 0 && !is_display_win_or_lose) {
+      const running_out_of_spin = document.querySelector('.running-out-spin')
+      running_out_of_spin.style.display = 'block'
+      running_out_of_spin.innerHTML = `
+        <h3 class="text-danger">You're running out of spin. Try again ${resetAfter()}.</h3>
+        <button onclick="closeRoleta()" class="btn btn-default btn-sm" style="margin-top: 20px">Close</button>
+      `
+    } else {
+      document.querySelector('.running-out-spin').style.display = 'none'
+    }
+  })
+}
+
+function resetAfter () {
+  const {roleta_game} = fetchedData.config
+  const {reset_spin_after} = roleta_game
+  if (reset_spin_after === 'today') return 'tomorrow'
+  else if (reset_spin_after === 'this_week') return 'next week'
+  else if (reset_spin_after === 'this_month') return 'next month'
+}
+
+function roletaGame (roleta_game) {
+  getSpinLeft()
+  const prizes = roleta_game.prizes
+  const rand = (m, M) => Math.random() * (M - m) + m
+  const all_prizes = prizes.length
+  const wheel_spin = document.querySelector('#spin')
+  const wheel = document.querySelector('#wheel').getContext('2d')
+  const win_or_lose = document.querySelector('.win-or-lose-div')
+  const dia = wheel.canvas.width
+  const rad = dia / 2
+  const PI = Math.PI
+  const TAU = 2 * PI
+  const arc = TAU / prizes.length
+  const friction = 0.995
+  let angVel = 0
+  let ang = 0
+
+  const getIndex = () => Math.floor(all_prizes - ang / TAU * all_prizes) % all_prizes
+
+  function drawSector (sector, i) {
+    const ang = arc * i
+    wheel.save()
+
+    wheel.beginPath()
+    wheel.fillStyle = sector.color
+    wheel.moveTo(rad, rad)
+    wheel.arc(rad, rad, rad, ang, ang + arc)
+    wheel.lineTo(rad, rad)
+    wheel.fill()
+
+    wheel.translate(rad, rad)
+    wheel.rotate(ang + arc / 2)
+    wheel.textAlign = 'right'
+    wheel.fillStyle = '#fff'
+    wheel.font = 'bold 23px sans-serif'
+    wheel.fillText(sector.prize_text, rad - 10, 10)
+    wheel.restore()
+  }
+
+  function winner (prize) {
+    const {is_admin_prize, bonus_minutes, bonus_mb, prize_text} = prize
+    is_playing = true
+    roleta_win_audio.play()
+    win_or_lose.style = 'display: block'
+
+    if (!is_admin_prize) {
+      httpPost(addRoletaBonusUrl, {bonus_minutes, bonus_mb}, function () {})
+
+      win_or_lose.innerHTML = `
+        <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
+        <br>
+        <p>You can claim this reward to REWARDS tab. </p>
+        <div class="text-center" style="margin-top: 10px">
+          <button class="btn btn-default" onclick="closePopPup()">close</button>
+        </div>
+      `
+    } else {
+      win_or_lose.innerHTML = ` 
+        <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
+        <br>
+        <p>Contact your admin for your reward. Close this after you received your rewards for your proof.</p>
+        <div class="text-center" style="margin-top: 10px">
+          <button class="btn btn-default" onclick="closePopPup()">close</button>
+        </div>
+      `
+    }
+  }
+
+  function lose () {
+    is_playing = true
+    roleta_lose_audio.play()
+    win_or_lose.style = 'display: block'
+    win_or_lose.innerHTML = ` 
+      <h3 class="text-danger">You lose, try another spin.</h3>
+      <div class="text-center" style="margin-top: 10px">
+        <button class="btn btn-default" onclick="closePopPup()">close</button>
+      </div>
+    `
+  }
+
+  function rotate () {
+    const sector = prizes[getIndex()]
+    wheel.canvas.style.transform = `rotate(${ang - PI / 2}rad)`
+    wheel_spin.style.background = sector.color
+    if (!angVel && is_spinning) {
+      is_spinning = false
+      is_display_win_or_lose = true
+      if (sector.has_prize) {
+        winner(sector)
+      } else {
+        lose()
+      }
+    }
+  }
+  function frame () {
+    if (!angVel) return
+    angVel *= friction // Decrement velocity by friction
+    if (angVel < 0.002) {
+      angVel = 0 // Bring to stop
+      roleta_spin_audio.stop()
+      is_playing = false
+    }
+    ang += angVel // Update angle
+    ang %= TAU // Normalize angle
+    rotate()
+  }
+
+  function start () {
+    frame()
+    animation = requestAnimationFrame(start)
+  }
+  rotate() // Initial rotation
+  start()
+  prizes.forEach(drawSector)
+
+  wheel_spin.addEventListener('click', () => {
+    if (!angVel && !is_display_win_or_lose && spin_left > 0) {
+      prizes.forEach(drawSector)
+      is_playing = true
+      is_spinning = true
+      roleta_spin_audio.play()
+      angVel = rand(1, 5)
+      httpPost(updateRoletaUrl, null, function () {})
+    }
+  })
 }
 
 (function () {

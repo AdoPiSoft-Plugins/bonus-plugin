@@ -23,6 +23,7 @@
       if ($ctrl.selected === 'data') certain_amount.bonus_minutes = 0
       else if ($ctrl.selected === 'time') certain_amount.bonus_mb = 0
       $ctrl.settings.certain_amount = certain_amount
+      delete $ctrl.settings.roleta_game
 
       $http.post('/bonus-plugin-settings', $ctrl.settings).then(SettingsSavedToastr).catch(CatchHttpError)
     }

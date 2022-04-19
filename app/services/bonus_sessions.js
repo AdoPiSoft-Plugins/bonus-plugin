@@ -7,9 +7,10 @@ exports.load = async (device) => {
   const {models, Sequelize} = await db.getInstance()
   const {Op} = Sequelize
   const {enable_bonus, certain_amount} = await cfg.read()
+
   if (enable_bonus) {
     //for certain amount challenge only
-    if (certain_amount) {
+    if (certain_amount.enable) {
       exports.setDate(certain_amount)
 
       const {bonus_amount_needed, bonus_mb, bonus_minutes} = certain_amount
@@ -140,4 +141,18 @@ exports.collect = async (params, device) => {
       }
     })
   }
+}
+
+exports.addBonus = async (params, device) => {
+  const {models} = await db.getInstance()
+  const {bonus_minutes, bonus_mb} = params
+  const machine_id = await machine.getId()
+
+  await models.BonusSession.create({
+    machine_id,
+    mobile_device_id: device.db_instance.id,
+    bonus_mb,
+    bonus_minutes,
+    type: 'roleta_game'
+  })
 }
