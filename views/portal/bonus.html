@@ -77,8 +77,15 @@
     height: 92%;
     display: none;
   }
-
-  .disabled-bonus .disabled-bonus-div h4 {
+  .roleta-game {
+    margin-top: 10px;
+    padding: 5px 10px 10px 10px;
+    background: #F9F8EB;
+    height: 92%;
+    display: none;
+    color: black;
+  }
+  .disabled-bonus .disabled-bonus-div h4{
     margin: 0;
     position: absolute;
     top: 50%;
@@ -118,8 +125,114 @@
     font-weight: bold;
   }
 
-  @media (max-width: 500px) {
-    .bonus-plugin .bonus-container {
+  .roleta-game-container1{
+    position: absolute;
+    top:  45%;
+    left: 23%;
+    transform: translateX(-15%) translateY(-40%);
+  }
+  .win-or-lose-div{
+    position: absolute;
+    padding: 40px 20px 20px 20px;
+    box-shadow: 2px 6px 42px 5px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 2px 6px 42px 5px rgba(0,0,0,0.75);
+    -moz-box-shadow: 2px 6px 42px 5px rgba(0,0,0,0.75);
+    top: 10%;
+    left: 0%;
+    width: 100%;
+    background: wheat;
+    z-index: 1;
+     -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+    display: none;
+  }
+
+  .running-out-spin{
+    position: absolute;
+    padding: 40px 20px 20px 20px;
+    box-shadow: 2px 6px 42px 5px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 2px 30px 100px 5px rgba(0,0,0,0.75);
+    -moz-box-shadow: 2px 6px 42px 5px rgba(0,0,0,0.75);
+    top: 10%;
+    left: 0%;
+    width: 100%;
+    color: green;
+    background: wheat;
+    z-index: 1;
+     -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+    display: none;
+    height: 150px;
+
+  }
+
+  @-webkit-keyframes fadeIn {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+  }
+
+  .roleta-container2 {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #wheel {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+  }
+
+  #spin {
+    font: 15px sans-serif;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 51%;
+    left: 51%;
+    width: 14%;
+    height: 14%;
+    margin: -8%;
+    color: #fff;
+    box-shadow: 0 0 0 8px currentColor, 0 0px 15px 5px rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    transition: 0.8s;
+  }
+
+  #spin::after {
+    content: "";
+    position: absolute;
+    top: -17px;
+    border: 10px solid transparent;
+    border-bottom-color: currentColor;
+    border-top: none;
+  }
+  .spin-left{
+    font-weight: bold;
+  }
+
+  @media screen and (min-width: 241px)  and (max-width: 500px)
+  {
+    #container{
+      left: 0;
+      transform: translateX(0) translateY(-50%);
+    }
+    #spin{
+      font-size: 15px;
+    }
+  }
+
+  @media (max-width:  400px){
+    .bonus-plugin .bonus-container{
       width: 100%;
     }
   }
@@ -138,23 +251,39 @@
     <div class="bonus-list">
       <ul>
         <li class="rewards" onclick="tabClick(1)">
-          <a>Rewards</a>
+          <a>REWARDS</a>
         </li>
         <li class="challenges" onclick="tabClick(2)">
-          <a>Challenges</a>
+          <a>CHALLENGES</a>
         </li>
       </ul>
       <div class="tab-content">
-        <div class="rewards-div">
-
-        </div>
+        <button class="btn btn-info btn-xs" id="refresh-btn" onclick="initBonusSettings()" style="margin-bottom: 5px">Refresh</button>
+        <div class="rewards-div"></div>
         <div class="challenges-div" style="display: none; margin: 0; padding: 0;">
         </div>
       </div>
     </div>
     <div class="disabled-bonus">
       <div class="disabled-bonus-div">
-        <h4 class="text-center">Bonus is temporarily disabled by the administrator.</h4>
+        <h4 class="text-center text-info">Bonus is temporarily disabled by the administrator. Contact admin to enable this.</h4>
+      </div>
+    </div>
+    <div class="roleta-game">
+      <div class="loading-roleta">Loading, please wait ...</div>
+      <div class="roleta-game-main" style="display: none">
+        <div class="running-out-spin text-center">
+        </div>
+        <div class="roleta-game-container">
+          <div class="win-or-lose-div text-center"></div>
+          <div class="roleta-game-container1">
+            <p class="text-center text-success spin-left"></p>
+            <div class="roleta-container2">
+              <canvas id="wheel" width="650" height="650"></canvas>
+              <div id="spin">SPIN</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

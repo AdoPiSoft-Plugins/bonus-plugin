@@ -1,5 +1,5 @@
 const router = require('./router.js')
-const {app} = require('../core.js')
+const { app } = require('../core.js')
 const models = require('./models')
 const config = require('./config.js')
 

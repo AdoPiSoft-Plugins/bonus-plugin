@@ -10,21 +10,21 @@
     function load () {
       $http.get('/bonus-plugin-settings').then(res => {
         $ctrl.settings = res.data
-        $ctrl.config = $ctrl.settings
+        $ctrl.certain_cfg = $ctrl.settings.certain_amount || {}
 
-        $ctrl.optionIsRequired = !$ctrl.config.bonus_limit_days
+        $ctrl.optionIsRequired = !$ctrl.certain_cfg.bonus_limit_days
 
-        if ($ctrl.config.bonus_minutes === 0) $ctrl.selected = 'data'
-        if ($ctrl.config.bonus_mb === 0) $ctrl.selected = 'time'
+        if ($ctrl.certain_cfg.bonus_minutes === 0) $ctrl.selected = 'data'
+        if ($ctrl.certain_cfg.bonus_mb === 0) $ctrl.selected = 'time'
       }).catch(CatchHttpError)
     }
-    $ctrl.update = () => {
-      var config = $ctrl.config
-      if ($ctrl.selected === 'data') config.bonus_minutes = 0
-      else if ($ctrl.selected === 'time') config.bonus_mb = 0
-      config.bonus_type = 'certain_amount'
-      $ctrl.settings = config
 
+    $ctrl.update = () => {
+      var certain_cfg = $ctrl.certain_cfg
+      if ($ctrl.selected === 'data') certain_cfg.bonus_minutes = 0
+      else if ($ctrl.selected === 'time') certain_cfg.bonus_mb = 0
+      $ctrl.settings.certain_amount = certain_cfg
+    
       $http.post('/bonus-plugin-settings', $ctrl.settings).then(SettingsSavedToastr).catch(CatchHttpError)
     }
 

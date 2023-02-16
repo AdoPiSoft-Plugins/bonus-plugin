@@ -7,12 +7,9 @@ angular.module('Plugins')
         CatchHttpError(e)
       })
     }
-
-    $scope.enable_bonus = () => {
-      $http.post('/bonus-plugin-settings', $scope.settings)
-        .then(SettingsSavedToastr)
-        .catch(CatchHttpError)
-    }
-
+    $scope.$watch('settings.enable_bonus', function (val, oldVal) {
+      if (val == null || oldVal === null || oldVal === undefined) return
+      $http.post('/bonus-plugin-settings', $scope.settings).then(SettingsSavedToastr).catch(CatchHttpError)
+    })
     load()
   })

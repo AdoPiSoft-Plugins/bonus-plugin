@@ -4,7 +4,7 @@
     <form name="bonusForm">
       <div class="checkbox">
         <label class="custom-checkbox control-label">
-          <input type="checkbox" name="enable_bonus" ng-change="enable_bonus()" ng-model="settings.enable_bonus">
+          <input type="checkbox" name="enable_bonus" ng-model="settings.enable_bonus">
           <strong>Enable Bonus</strong>
           <span class="help-block">When enabled, customers can have bonus session if they completed the
             challenges.</span>
@@ -16,6 +16,9 @@
       <uib-tabset>
         <uib-tab heading="Reach Certain Amount">
           <certain-amount></certain-amount>
+        </uib-tab>
+        <uib-tab heading="Roleta Game">
+          <roleta-game></roleta-game>
         </uib-tab>
         <uib-tab heading="New Challenge">
           <di class="padd-top">

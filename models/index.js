@@ -1,10 +1,12 @@
 'use strict'
 
 const {dbi, machine_id} = require('../../core.js')
-const BonusSession = require('./bonus_session_model.js')
+const BonusSession = require('./bonus_session.js')
+const RoletaUser = require('./roleta_user.js')
 
 const model_files = {
-  BonusSession
+  BonusSession,
+  RoletaUser
 }
 
 exports.init = async () => {
@@ -36,6 +38,8 @@ exports.init = async () => {
   models.BonusSession.addScope('default_scope', default_scope)
   models.BonusSession.belongsTo(models.MobileDevice)
   models.MobileDevice.hasMany(models.BonusSession)
+  models.RoletaUser.addScope('default_scope', default_scope)
+  models.RoletaUser.belongsTo(models.MobileDevice)
 
   return dbi
 }

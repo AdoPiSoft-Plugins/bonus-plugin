@@ -13,10 +13,10 @@ module.exports = (sequelize, Sequelize) => {
   return sequelize.define(model_name, {
     id: {
       primaryKey: true,
-      type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
+      type: Sequelize.INTEGER,
       allowNull: false,
-      unique: true
+      unique: true,
+      autoIncrement: true
     },
     machine_id: {
       type: Sequelize.STRING
@@ -46,6 +46,10 @@ module.exports = (sequelize, Sequelize) => {
     is_activated: {
       type: Sequelize.BOOLEAN,
       defaultValue: false
+    },
+    customer_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true
     }
   }, opts)
 }

@@ -1,20 +1,35 @@
 
 const core = require('../core.js')
 const {middlewares, router} = core
-const {bodyParser, express, device_reg, act} = middlewares
 
 const admin_ctrl = require('./controllers/admin_ctrl.js')
 const portal_ctrl = require('./controllers/portal_ctrl.js')
+const fileUpload = require('express-fileupload')
+
+const { bodyParser, express, device_reg, act, current_customer } = middlewares
 
 router.get('/bonus-plugin-settings', admin_ctrl.get)
 router.post('/bonus-plugin-settings', act, express.urlencoded({
   extended: true
 }), bodyParser.json(), admin_ctrl.update)
+router.post('/bonus-plugin-settings/roleta-game/sounds',
+  fileUpload({
+    limits: {fileSize: 5 * 1024 * 1024 * 1024},
+    useTempFiles: true,
+    tempFileDir: process.env.TMPDIR
+  }), admin_ctrl.uploadSound)
+router.post('/bonus-plugin-settings/roleta-game/sounds/delete',
+  express.urlencoded({
+    extended: true
+  }), bodyParser.json(), admin_ctrl.deleteSound)
 
-router.get('/bonus-plugin/portal/all', device_reg, portal_ctrl.init)
-router.post('/bonus-plugin/portal/collect', device_reg,
+router.get('/bonus-plugin/portal/all', device_reg, current_customer, portal_ctrl.init)
+router.post('/bonus-plugin/portal/collect', device_reg, current_customer,
   express.urlencoded({
     extended: true
   }), bodyParser.json(), portal_ctrl.collect)
 
+router.get('/bonus-plugin/portal/roleta-game/spin-left', device_reg, current_customer, portal_ctrl.getSpinLeft)
+router.post('/bonus-plugin/portal/roleta-game/update', device_reg, current_customer, portal_ctrl.update)
+router.post('/bonus-plugin/portal/roleta-game/add-bonus', device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.addBonus)
 module.exports = router
