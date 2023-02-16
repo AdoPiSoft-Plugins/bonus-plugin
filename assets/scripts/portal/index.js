@@ -417,7 +417,7 @@ function roletaGame (roleta_game) {
       win_or_lose.innerHTML = ` 
         <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
         <br>
-        <p>Contact your admin for your reward. Screenshot this after you received your rewards for your proof.</p>
+        <p>Contact your admin for your reward. Screenshot this for the proof.</p>
         <div class="text-center" style="margin-top: 10px">
           <button class="btn btn-default" onclick="closePopPup()">close</button>
         </div>
@@ -430,7 +430,7 @@ function roletaGame (roleta_game) {
     roleta_lose_audio.play()
     win_or_lose.style = 'display: block'
     win_or_lose.innerHTML = ` 
-      <h3 class="text-danger">You lose, try another spin.</h3>
+      <h3 class="text-danger">You lose, Try another spin.</h3>
       <div class="text-center" style="margin-top: 10px">
         <button class="btn btn-default" onclick="closePopPup()">close</button>
       </div>
