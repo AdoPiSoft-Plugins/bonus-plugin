@@ -7,7 +7,12 @@ const { machine_id, dbi, sessions_manager} = core
 exports.load = async (device, customer) => {
   const { models, Sequelize} = dbi
   const { Op } = Sequelize
-  const { enable_bonus, certain_amount } = await cfg.read()
+  const { enable_bonus, certain_amount, roleta_game } = await cfg.read()
+
+  //clear database
+  if (!certain_amount && !roleta_game) {
+    exports.clearBonusDB()
+  }
 
   //for certain amount challenge only
   if (enable_bonus && certain_amount && certain_amount.enable) {
@@ -60,6 +65,23 @@ exports.load = async (device, customer) => {
   return exports.list(device.db_instance.id, customer)
 }
 
+exports.clearBonusDB = async () => {
+  const { models } = dbi
+  const bonus_sessions = await models.BonusSession.findAll({})
+  const roleta_users = await models.RoletaUser.findAll({})
+
+  if (bonus_sessions) {
+    for(const b of bonus_sessions ) {
+      await b.destroy()
+    }
+  }
+  if (roleta_users) {
+    for(const r of roleta_users) {
+      await r.destroy()
+    }
+  }
+}
+
 exports.list = async (device_id, customer) => {
   const { models } = dbi
   const bonus_sessions = await models.BonusSession.findAll({
@@ -71,16 +93,6 @@ exports.list = async (device_id, customer) => {
   })
 
   return bonus_sessions.map(item => item)
-}
-
-exports.deleteAllCertainAmount = async () => {
-  const { models } = dbi
-  const allBonus = await models.BonusSession.findAll({
-    where: { type: 'certain_amount', is_activated: false}
-  })
-  for (const b in allBonus) {
-    await allBonus[b].destroy()
-  }
 }
 
 exports.setDate = (certain_amount) => {

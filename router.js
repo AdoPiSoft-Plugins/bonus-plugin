@@ -1,12 +1,12 @@
 
 const core = require('../core.js')
-const {middlewares, router} = core
+const { middlewares, router } = core
 
 const admin_ctrl = require('./controllers/admin_ctrl.js')
 const portal_ctrl = require('./controllers/portal_ctrl.js')
 const fileUpload = require('express-fileupload')
 
-const { bodyParser, express, device_reg, act, current_customer } = middlewares
+const { bodyParser, express, device_reg, act, current_customer, ipv4 } = middlewares
 
 router.get('/bonus-plugin-settings', admin_ctrl.get)
 router.post('/bonus-plugin-settings', act, express.urlencoded({
@@ -23,13 +23,13 @@ router.post('/bonus-plugin-settings/roleta-game/sounds/delete',
     extended: true
   }), bodyParser.json(), admin_ctrl.deleteSound)
 
-router.get('/bonus-plugin/portal/all', device_reg, current_customer, portal_ctrl.init)
-router.post('/bonus-plugin/portal/collect', device_reg, current_customer,
+router.get('/bonus-plugin/portal/all', ipv4, device_reg, current_customer, portal_ctrl.init)
+router.post('/bonus-plugin/portal/collect', ipv4, device_reg, current_customer,
   express.urlencoded({
     extended: true
   }), bodyParser.json(), portal_ctrl.collect)
 
-router.get('/bonus-plugin/portal/roleta-game/spin-left', device_reg, current_customer, portal_ctrl.getSpinLeft)
-router.post('/bonus-plugin/portal/roleta-game/update', device_reg, current_customer, portal_ctrl.update)
-router.post('/bonus-plugin/portal/roleta-game/add-bonus', device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.addBonus)
+router.get('/bonus-plugin/portal/roleta-game/spin-left', ipv4, device_reg, current_customer, portal_ctrl.getSpinLeft)
+router.post('/bonus-plugin/portal/roleta-game/update', ipv4,  device_reg, current_customer, portal_ctrl.update)
+router.post('/bonus-plugin/portal/roleta-game/add-bonus', ipv4, device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.addBonus)
 module.exports = router
