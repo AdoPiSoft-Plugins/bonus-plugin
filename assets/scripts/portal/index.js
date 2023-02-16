@@ -70,15 +70,6 @@ function closeBonus () {
     document.querySelector('.bonus-container').style = 'display: none'
     tabClick(1)
     closeRoleta()
-     httpGet(getAllBonusUrl, function (data) {
-      fetchedData = JSON.parse(data)
-      const bonus = fetchedData.bonus
-      if (bonus.length > 0) {
-        hasUnclaim()
-      } else {
-        hasClaim()
-      }
-    })
   }
 }
 
@@ -511,16 +502,6 @@ function setSpinSize() {
   }
 }
 
-function hasUnclaim () {
-  const unclaim_indicator = document.querySelector('.unclaim-indicator')
-  unclaim_indicator.style.display = ''
-}
-
-function hasClaim () {
-  const unclaim_indicator = document.querySelector('.unclaim-indicator')
-  unclaim_indicator.style.display = 'none'
-}
-
 (function () {
   'use strict'
   setTimeout(() => {
@@ -531,18 +512,6 @@ function hasClaim () {
         bonus_plugin.innerHTML = html
         var body = document.querySelector('body')
         body.append(bonus_plugin)
-
-        httpGet(getAllBonusUrl, function (data) {
-          fetchedData = JSON.parse(data)
-          const bonus = fetchedData.bonus
-
-          if (bonus.length > 0) {
-            hasUnclaim()
-          } else {
-            hasClaim()
-          }
-        })
-
       })
     }
   }, 1e3)
