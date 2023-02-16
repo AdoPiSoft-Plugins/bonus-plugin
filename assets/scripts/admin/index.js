@@ -4,7 +4,13 @@
       templateUrl: '/plugins/bonus-plugin/views/admin/admin.html',
       url: '/bonus-plugin',
       title: 'Bonus Plugin',
-      controller: 'BonusCtrl as $ctrl'
+      controller: 'BonusCtrl as $ctrl',
+      sidebarMeta: {
+        order: 2,
+        icon: "fa fa-gift",
+        text: "Bonus Plugin",
+        href: "plugins.bonus_plugin"
+      }
     })
   })
 })()
