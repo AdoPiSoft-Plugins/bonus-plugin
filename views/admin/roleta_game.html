@@ -1,37 +1,28 @@
 <form class="padd-top" name="roletaMainSettingsForm" ng-submit="$ctrl.saveSettings(1)">
-  <div class="checkbox">
-    <label class="custom-checkbox control-label">
-      <input type="checkbox" name="enable" ng-model="$ctrl.roleta.enable">
-      <strong>Enable</strong>
-      <span class="help-block">When enabled, Roleta Game is added in the bonus challenges and then customer can now spin and win any prizes.</span>
-    </label>
-  </div>  
-  <div  ng-if="$ctrl.roleta.enable">
-    <div class="form-group" ng-class="{'has-error': roletaMainSettingsForm.max_spin.$invalid, 'has-success':  roletaMainSettingsForm.max_spin.$valid && roletaMainSettingsForm.max_spin.$touched}"
-    >
-      <label class="control-label">Maximum Spin:</label>
-      <input class="form-control" name="max_spin" ng-model="$ctrl.roleta.max_spin" type="number" required min="1">
-      <span class="help-block" ng-if="roletaMainSettingsForm.max_spin.$error.required">
-          It is required
-      </span>
-      <span class="help-block" ng-if="roletaMainSettingsForm.max_spin.$error.min">
-          Minimum is 1
-      </span>
-    </div>
-    <div class="form-group" ng-class="{'has-error': $ctrl.optionIsRequired, 'has-success': !$ctrl.optionIsRequired}">
-      <label class="control-label">Reset Customer Spin After:</label>
-       <select class="form-control" name="reset_spin_after" ng-model="$ctrl.roleta.reset_spin_after" ng-change="$ctrl.optionIsRequired = false">
-          <option value="today">Today</option>
-          <option value="this_week">This Week</option>
-          <option value="this_month">This Month</option>
-        </select>
-      <span class="help-block" ng-if="$ctrl.optionIsRequired">It is required</span>
-    </div>
-    
+  <div class="form-group" ng-class="{'has-error': roletaMainSettingsForm.max_spin.$invalid, 'has-success':  roletaMainSettingsForm.max_spin.$valid && roletaMainSettingsForm.max_spin.$touched}"
+  >
+    <label class="control-label">Maximum Spin:</label>
+    <input class="form-control" name="max_spin" ng-model="$ctrl.roleta.max_spin" type="number" required min="1">
+    <span class="help-block" ng-if="roletaMainSettingsForm.max_spin.$error.required">
+        It is required
+    </span>
+    <span class="help-block" ng-if="roletaMainSettingsForm.max_spin.$error.min">
+        Minimum is 1
+    </span>
   </div>
-  <button class="btn btn-success" type="submit" ng-disabled="(roletaMainSettingsForm.$invalid || roletaMainSettingsForm.$pristine || $ctrl.optionIsRequired) && $ctrl.roleta.enable">Save Settings</button>
+  <div class="form-group" ng-class="{'has-error': $ctrl.optionIsRequired, 'has-success': !$ctrl.optionIsRequired}">
+    <label class="control-label">Reset Customer Spin After:</label>
+     <select class="form-control" name="reset_spin_after" ng-model="$ctrl.roleta.reset_spin_after" ng-change="$ctrl.optionIsRequired = false">
+        <option value="today">Today</option>
+        <option value="this_week">This Week</option>
+        <option value="this_month">This Month</option>
+      </select>
+    <span class="help-block" ng-if="$ctrl.optionIsRequired">It is required</span>
+  </div>
+    
+  <button class="btn btn-success" type="submit" ng-disabled="(roletaMainSettingsForm.$invalid || roletaMainSettingsForm.$pristine || $ctrl.optionIsRequired)">Save Settings</button>
 </form>
-<div ng-if="$ctrl.roleta.enable"> 
+<div> 
   <hr>
   <div class="form-group">
     <label class="control-label">Spin Background Sound:</label>
@@ -69,7 +60,7 @@
     </div>
   </div>
 </div>
-<div ng-if="$ctrl.roleta.enable">
+<div>
   <hr>
   <span class="help-block">Add roleta choices, minimum of 3 choices else customer's can't play this game.</span>
   <div class="padd-top row">

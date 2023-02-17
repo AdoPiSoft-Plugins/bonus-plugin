@@ -57,6 +57,7 @@ exports.getRoletaUser = async (cfg, db_device, customer) => {
   })
 
   if (roleta_user && roleta_user.updated_at < from_date) {
+    
     //reset user spin
     await roleta_user.update({spinned: 0})
 

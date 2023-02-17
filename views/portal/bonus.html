@@ -241,6 +241,7 @@
 <div class="bonus-plugin">
   <a href="javascript:void(0)" onclick="openBonus()" class="bonus-main-icon">
     <img class="bonus-icon" alt="" src="/plugins/bonus-plugin/assets/images/gift-icon.png">
+    <span class="unclaim-indicator" style="display: none; font-weight: bold; font-size: 25px; color: red;">!</span>
   </a>
   <div class="bonus-container">
     <a onclick="closeBonus()" href="javascript:void(0)" class='close'>
@@ -253,14 +254,14 @@
         <li class="rewards" onclick="tabClick(1)">
           <a>REWARDS</a>
         </li>
-        <li class="challenges" onclick="tabClick(2)">
-          <a>CHALLENGES</a>
+        <li class="game" onclick="tabClick(2)">
+          <a>GAMES</a>
         </li>
       </ul>
       <div class="tab-content">
         <button class="btn btn-info btn-xs" id="refresh-btn" onclick="initBonusSettings()" style="margin-bottom: 5px">Refresh</button>
         <div class="rewards-div"></div>
-        <div class="challenges-div" style="display: none; margin: 0; padding: 0;">
+        <div class="game-div" style="display: none; margin: 0; padding: 0;">
         </div>
       </div>
     </div>
@@ -273,6 +274,8 @@
       <div class="loading-roleta">Loading, please wait ...</div>
       <div class="roleta-game-main" style="display: none">
         <div class="running-out-spin text-center">
+        </div>
+        <div class="cam text-center">
         </div>
         <div class="roleta-game-container">
           <div class="win-or-lose-div text-center"></div>

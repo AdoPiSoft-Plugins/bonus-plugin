@@ -7,79 +7,27 @@ const { machine_id, dbi, sessions_manager} = core
 exports.load = async (device, customer) => {
   const { models, Sequelize} = dbi
   const { Op } = Sequelize
-  const { enable_bonus, certain_amount, roleta_game } = await cfg.read()
+  let configs = await cfg.read()
+  const { enable_bonus, certain_amount } = configs
 
-  //clear database
-  if (!certain_amount && !roleta_game) {
-    exports.clearBonusDB()
-  }
-
-  //for certain amount challenge only
   if (enable_bonus && certain_amount && certain_amount.enable) {
     exports.setDate(certain_amount)
 
     const { bonus_amount_needed, bonus_mb, bonus_minutes } = certain_amount
-    const total_amount = await exports.findTotalAmount(device.db_instance.id)
-
-    // const exist_sessions = await models.BonusSession.findAll({
-    //   where: {
-    //     mobile_device_id: device.db_instance.id,
-    //     type: 'certain_amount',
-    //     customer_id: customer.id
-    //   },
-    // })
-
-    // //destory bonus_session if activated and after the limitation date
-    // await exist_sessions.map(async s => {
-    //   const is_after_limitation_date = moment(exports.from_date).startOf('day').toDate() > moment(s.created_at).endOf('day').toDate() || false
-    //   if (s.is_activated && is_after_limitation_date) {
-    //     await s.destroy()
-    //   }
-    // })
+    const total_amount = await exports.findTotalAmount(device.db_instance.id, customer)
 
     if (total_amount >= bonus_amount_needed) {
-      const is_exist = await models.BonusSession.findOne({
-        where: {
-          mobile_device_id: device.db_instance.id,
-          type: 'certain_amount',
-          created_at: {
-            [Op.gte]: exports.from_date,
-            [Op.lte]: exports.to_date
-          },
-          customer_id: customer.id
-        }
-      })
-
-      if (!is_exist) {
-        await models.BonusSession.create({
-          machine_id,
-          type: 'certain_amount',
-          mobile_device_id: device.db_instance.id,
-          bonus_mb,
-          bonus_minutes,
-          customer_id: customer.id
-        })
-      }
+      configs.can_play = true
+    } else {
+      configs.can_play = false
     }
+    
+  } else {
+    configs.can_play = true
   }
+
+  await cfg.save(configs)
   return exports.list(device.db_instance.id, customer)
-}
-
-exports.clearBonusDB = async () => {
-  const { models } = dbi
-  const bonus_sessions = await models.BonusSession.findAll({})
-  const roleta_users = await models.RoletaUser.findAll({})
-
-  if (bonus_sessions) {
-    for(const b of bonus_sessions ) {
-      await b.destroy()
-    }
-  }
-  if (roleta_users) {
-    for(const r of roleta_users) {
-      await r.destroy()
-    }
-  }
 }
 
 exports.list = async (device_id, customer) => {
@@ -109,7 +57,7 @@ exports.setDate = (certain_amount) => {
   }
 }
 
-exports.findTotalAmount = async (id) => {
+exports.findTotalAmount = async (id, customer) => {
   const { models, Sequelize } = dbi
   const {Op} = Sequelize
   const sum = await models.Transaction.scope(['default_scope']).sum('amount', {
@@ -118,7 +66,8 @@ exports.findTotalAmount = async (id) => {
       created_at: {
         [Op.gte]: exports.from_date,
         [Op.lte]: exports.to_date
-      }
+      },
+      customer_id: customer.id
     }
   })
   console.log('total_amount: ', sum)

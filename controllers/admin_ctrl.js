@@ -42,3 +42,7 @@ exports.deleteSound = async (req, res, next) => {
     next(e)
   }
 }
+
+exports.reset = async (req, res, next) => {
+  
+}

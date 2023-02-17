@@ -13,20 +13,23 @@
     </form>
     <hr>
     <div ng-if="settings.enable_bonus">
-      <uib-tabset>
-        <uib-tab heading="Reach Certain Amount">
-          <certain-amount></certain-amount>
-        </uib-tab>
-        <uib-tab heading="Roleta Game">
-          <roleta-game></roleta-game>
-        </uib-tab>
-        <uib-tab heading="New Challenge">
-          <di class="padd-top">
-            <br>
-            <p>COMING SOON ...</p>
-          </div>
-        </uib-tab>
-      </uib-tabset>
+      <certain-amount></certain-amount>
+      <div class="panel panel-primary">
+        <div class="panel-heading">Bonus game</div>
+        <div class="panel-body">
+          <uib-tabset>
+            <uib-tab heading="Roleta Game">
+              <roleta-game></roleta-game>
+            </uib-tab>
+            <uib-tab heading="New Game">
+              <di class="padd-top">
+                <br>
+                <p>COMING SOON ...</p>
+              </div>
+            </uib-tab>
+          </uib-tabset>
+        </div>
+      </div>
     </div>
   </div>
 </div>
