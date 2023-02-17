@@ -59,7 +59,7 @@ exports.getRoletaUser = async (cfg, db_device, customer) => {
   if (roleta_user && roleta_user.updated_at < from_date) {
     
     //reset user spin
-    await roleta_user.update({spinned: 0})
+    await roleta_user.update({ spinned: 0 })
 
     updated_roleta_user = await models.RoletaUser.findOne({
       where: {
@@ -70,4 +70,13 @@ exports.getRoletaUser = async (cfg, db_device, customer) => {
   }
 
   return !updated_roleta_user ? roleta_user : updated_roleta_user
+}
+
+
+exports.resetSpin = async () => {
+  const { models } = dbi
+  const roleta_users = await models.RoletaUser.findAll({})
+  for (const user of roleta_users) {
+    user.update({ spinned: 0 })
+  }
 }

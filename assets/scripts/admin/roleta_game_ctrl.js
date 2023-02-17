@@ -4,7 +4,7 @@
     .component('roletaGame', {
       controller: 'RoletaGameCtrl',
       templateUrl: '/plugins/bonus-plugin/views/admin/roleta_game.html'
-    }).controller('RoletaGameCtrl', function ($scope, $http, CatchHttpError, SettingsSavedToastr, toastr, Upload) {
+    }).controller('RoletaGameCtrl', function ($scope, $http, CatchHttpError, SettingsSavedToastr, toastr, Upload, $ngConfirm) {
       var $ctrl = this
       $ctrl.has_prize_options = ['Yes', 'No']
 
@@ -107,6 +107,31 @@
           toastr.success('Sound delete successfully')
           getConfig()
         }).catch(CatchHttpError)
+      }
+
+      $ctrl.resetSpin = () => {
+        $ngConfirm({
+          title: 'Confirm Reset',
+          content: 'Are you sure you want to reset users spin?, this will reset all users spin.',
+          escapeKey: 'Close',
+          buttons: {
+            ok: {
+              text: 'Yes',
+              btnClass: 'btn-danger',
+              keys: ['enter'],
+              action: function () {
+                $http.post('/bonus-plugin/roleta-game/reset-spin').then(() => {
+                  toastr.success('Successfully reset users spin')
+                  getConfig()
+                })
+              }
+            },
+            close: {
+              text: 'Cancel',
+              btnClass: 'btn-default'
+            }
+          }
+        })
       }
 
       $ctrl.defaultPrizeField()

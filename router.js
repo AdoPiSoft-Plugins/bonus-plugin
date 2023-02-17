@@ -32,4 +32,6 @@ router.post('/bonus-plugin/portal/collect', ipv4, device_reg, current_customer,
 router.get('/bonus-plugin/portal/roleta-game/spin-left', ipv4, device_reg, current_customer, portal_ctrl.getSpinLeft)
 router.post('/bonus-plugin/portal/roleta-game/update', ipv4,  device_reg, current_customer, portal_ctrl.update)
 router.post('/bonus-plugin/portal/roleta-game/add-bonus', ipv4, device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.addBonus)
+router.post('/bonus-plugin/roleta-game/reset-spin', portal_ctrl.resetSpin)
+
 module.exports = router

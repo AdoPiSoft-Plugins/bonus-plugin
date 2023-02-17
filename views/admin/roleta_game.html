@@ -1,4 +1,9 @@
 <form class="padd-top" name="roletaMainSettingsForm" ng-submit="$ctrl.saveSettings(1)">
+  <div class="pull-right">
+    <button class="btn btn-danger btn-sm" type="button" ng-click="$ctrl.resetSpin()" >Reset Users Spin</button>
+  </div>
+  <br/>
+  <br/>
   <div class="form-group" ng-class="{'has-error': roletaMainSettingsForm.max_spin.$invalid, 'has-success':  roletaMainSettingsForm.max_spin.$valid && roletaMainSettingsForm.max_spin.$touched}"
   >
     <label class="control-label">Maximum Spin:</label>
@@ -140,6 +145,7 @@
       <button class="btn btn-success padd-top padd-bottom" type="submit" 
       ng-disabled="roletaGameForm.$invalid || roletaGameForm.$pristine "
       >Add</button>
+
     </form>
     <div class="col-md-7 scrollable-x">
       <table class="table table-striped">

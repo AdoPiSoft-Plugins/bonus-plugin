@@ -66,3 +66,13 @@ exports.addBonus = async (req, res, next) => {
     next(e)
   }
 }
+
+exports.resetSpin = async (req, res, next) => {
+  try {
+    await roleta_game.resetSpin()
+    res.json({success: true})
+  } catch (e) {
+    console.log(e)
+    next(e)
+  }
+}
