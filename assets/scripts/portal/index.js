@@ -216,7 +216,7 @@ function setBonusGame (game_div) {
       if (config && config.hasOwnProperty(item)) {
 
         if (item === 'roleta_game' &&  config.roleta_game && config.roleta_game.prizes.length > 2) {
-          const ct = `<span>Roleta Game. You can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Just click </span> <a onclick="initRoleta()">here.</a>`
+          const ct = `<span><strong>Roleta Game</strong>, you can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Just click </span> <a onclick="initRoleta()">here.</a>`
           games.push(ct)
         }
       }
@@ -238,7 +238,7 @@ function setBonusGame (game_div) {
   } else {
     const p = document.createElement('p')
     p.className = 'alert alert-info'
-    p.innerHTML = `Pay more than or equal to ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')}, to play the game/s.`
+    p.innerHTML = `Pay more than or equal to ${config.certain_amount && config.certain_amount.bonus_amount_needed} pesos within ${config.certain_amount && (config.certain_amount.bonus_limit_days).replace('_', ' ')}, to play the game/s.`
     game_div.append(p)
   }
 

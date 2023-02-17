@@ -2,7 +2,7 @@ const cfg = require('../config.js')
 const moment = require('moment')
 const core = require('../../core')
 
-const { machine_id, dbi, sessions_manager} = core
+const { machine_id, dbi, sessions_manager, bandwidth_cfg} = core
 
 exports.load = async (device, customer) => {
   const { models, Sequelize} = dbi
@@ -78,6 +78,8 @@ exports.findTotalAmount = async (id, customer) => {
 exports.collect = async (params, device, customer) => {
   const {bonus_mb, bonus_minutes, id, mobile_device_id} = params
   const { models } = dbi
+  const bdw_cfg = await bandwidth_cfg.read()
+  const { use_global } = bdw_cfg
 
   const type = bonus_mb > 0 && bonus_minutes > 0
     ? 'time_or_data'
@@ -90,6 +92,7 @@ exports.collect = async (params, device, customer) => {
       time_seconds: bonus_minutes * 60,
       data_mb: bonus_mb,
       allow_pause: false,
+      use_global_bandwidth: use_global,
       customer_id: customer.id
     }
 
