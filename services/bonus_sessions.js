@@ -78,7 +78,7 @@ exports.findTotalAmount = async (id, customer) => {
 exports.collect = async (params, device, customer) => {
   const {bonus_mb, bonus_minutes, id, mobile_device_id} = params
   const { models } = dbi
-  const bdw_cfg = await bandwidth_cfg.read()
+  const bdw_cfg = bandwidth_cfg ? await bandwidth_cfg.read() : {}
   const { use_global } = bdw_cfg
 
   const type = bonus_mb > 0 && bonus_minutes > 0
