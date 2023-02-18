@@ -68,6 +68,10 @@ function closeBonus () {
   if (!is_spinning && !clicked_roleta) {
     document.querySelector('.bonus-main-icon').style = 'display: block'
     document.querySelector('.bonus-container').style = 'display: none'
+    const complete_challenge_text = document.querySelector('.complete-challenge-text')
+    if (complete_challenge_text) {
+      complete_challenge_text.remove()
+    }
     tabClick(1)
     closeRoleta()
   }
@@ -173,6 +177,7 @@ function initBonusSettings (cb) {
       disabled_bonus_div.style = 'display: block'
       bonus_list.style.display = 'none'
     } else {
+      document.querySelector('.bonus-main-icon').style = 'display: block'
       disabled_bonus_div.style = 'display: none'
       bonus_list.style.display = 'block'
       if (rewards_div) {
@@ -186,6 +191,7 @@ function initBonusSettings (cb) {
         no_reward.innerText = 'No rewards yet.'
         rewards_div.append(no_reward)
       }
+
     }
     if (cb) cb(fetchedData)
   })
@@ -216,7 +222,7 @@ function setBonusGame (game_div) {
       if (config && config.hasOwnProperty(item)) {
 
         if (item === 'roleta_game' &&  config.roleta_game && config.roleta_game.prizes.length > 2) {
-          const ct = `<span><strong>Roleta Game</strong>, you can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Just click </span> <a onclick="initRoleta()">here.</a>`
+          const ct = `<span><strong>Roleta Game</strong>, you can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Play </span> <a onclick="initRoleta()">here.</a>`
           games.push(ct)
         }
       }
@@ -235,10 +241,15 @@ function setBonusGame (game_div) {
       p.innerHTML = 'No game, contact admin to add game.'
       game_div.append(p)
     }
-  } else {
+  } else if(!config.can_play && config.certain_amount) {
     const p = document.createElement('p')
     p.className = 'alert alert-info'
-    p.innerHTML = `Pay more than or equal to ${config.certain_amount && config.certain_amount.bonus_amount_needed} pesos within ${config.certain_amount && (config.certain_amount.bonus_limit_days).replace('_', ' ')}, to play the game/s.`
+    p.innerHTML = `Pay more than or equal to ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')}, to play the game/s.`
+    game_div.append(p)
+  } else {
+    const p = document.createElement('p')
+    p.className = 'alert alert-danger'
+    p.innerHTML = '<a href="javascript:window.location.reload()">Something went wrong? Click here to reload the page</a>'
     game_div.append(p)
   }
 
@@ -266,7 +277,7 @@ function tabClick (i) {
   }
 }
 
-function closeRoleta () {
+function closeRoleta () { 
   if (!is_spinning) {
     document.querySelector('.roleta-game').style = 'display: none'
     document.querySelector('.bonus-list').style = 'display: block'
@@ -286,15 +297,30 @@ function initRoleta () {
   document.querySelector('.disabled-bonus').style = 'display: none'
   document.querySelector('.roleta-game-main').style.display = 'none'
   document.querySelector('.loading-roleta').style.display = 'block'
-  document.querySelector('.roleta-game').style = 'display: block'
+
+  const roleta_game_div = document.querySelector('.roleta-game')
+  roleta_game_div.style = 'display: block'
 
   httpGet(getAllBonusUrl, function (data) {
     fetchedData = JSON.parse(data)
-    const {roleta_game} = fetchedData.config
-    const {spin_bg_sound, winner_sound, loser_sound} = roleta_game.sounds
-    roleta_spin_audio = setSound('spin', spin_bg_sound)
-    roleta_win_audio = setSound('win', winner_sound)
-    roleta_lose_audio = setSound('lose', loser_sound)
+    const { roleta_game, can_play } = fetchedData.config
+
+    if (!can_play) {
+      clicked_roleta = false
+      document.querySelector('.loading-roleta').style.display = 'none'
+      const p = document.createElement('p')
+      p.className = 'alert alert-danger text-center complete-challenge-text'
+      p.innerHTML = '<a onclick="refresh()">Ooops, complete the challenge first!</a>'
+      roleta_game_div.append(p)
+      return;
+    }
+
+    const { spin_bg_sound, winner_sound, loser_sound } = roleta_game ? roleta_game.sounds : {}
+    if (spin_bg_sound && winner_sound && loser_sound) {
+      roleta_spin_audio = setSound('spin', spin_bg_sound)
+      roleta_win_audio = setSound('win', winner_sound)
+      roleta_lose_audio = setSound('lose', loser_sound)
+    }
 
     if (roleta_game && roleta_game.prizes.length > 2) {
       setSpinSize()
@@ -304,6 +330,19 @@ function initRoleta () {
       window.location.reload()
     }
   })
+}
+
+function refresh() {
+  const game_div = document.querySelector('.game-div')
+  const roleta_game_div = document.querySelector('.roleta-game')
+  roleta_game_div.style.display = 'none'
+  const complete_challenge_text = document.querySelector('.complete-challenge-text')
+  if (complete_challenge_text) {
+    complete_challenge_text.remove()
+  }
+
+  setBonusGame(game_div)
+  initBonusSettings()
 }
 
 function setSound (dir, file_name) {
@@ -361,6 +400,23 @@ function resetAfter () {
   else if (reset_spin_after === 'this_month') return 'next month'
 }
 
+function gotToCollect () {
+  const game_div = document.querySelector('.game-div')
+  const rewards_div = document.querySelector('.rewards-div')
+  const rewards_a = document.querySelector('.rewards')
+  const game_a = document.querySelector('.game')
+  const refresh_btn = document.querySelector('#refresh-btn')
+
+  rewards_div.style.display = 'block'
+  refresh_btn.style.display = 'block'
+  game_div.style.display = 'none'
+  rewards_a.style = 'font-weight: bold; border-bottom: 3px solid #920092;'
+  game_a.style = 'font-weight: normal; border-bottom: none'
+
+  closeRoleta()
+  initBonusSettings()
+}
+
 function roletaGame (roleta_game) {
   getSpinLeft()
   const prizes = roleta_game.prizes
@@ -401,44 +457,48 @@ function roletaGame (roleta_game) {
   }
 
   function winner (prize) {
-    const {is_admin_prize, bonus_minutes, bonus_mb, prize_text} = prize
-    is_playing = true
-    roleta_win_audio.play()
-    win_or_lose.style = 'display: block'
+    httpPost(updateRoletaUrl, null, function () {
+      const {is_admin_prize, bonus_minutes, bonus_mb, prize_text} = prize
+      is_playing = true
+      roleta_win_audio.play()
+      win_or_lose.style = 'display: block'
 
-    if (!is_admin_prize) {
-      httpPost(addRoletaBonusUrl, {bonus_minutes, bonus_mb}, function () {})
+      if (!is_admin_prize) {
+        httpPost(addRoletaBonusUrl, {bonus_minutes, bonus_mb}, function () {})
 
-      win_or_lose.innerHTML = `
-        <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
-        <br>
-        <p>You can claim this reward to REWARDS tab. </p>
-        <div class="text-center" style="margin-top: 10px">
-          <button class="btn btn-default" onclick="closePopPup()">close</button>
-        </div>
-      `
-    } else {
-      win_or_lose.innerHTML = ` 
-        <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
-        <br>
-        <p>Contact your admin for your reward. Screenshot this for the proof.</p>
-        <div class="text-center" style="margin-top: 10px">
-          <button class="btn btn-default" onclick="closePopPup()">close</button>
-        </div>
-      `
-    }
+        win_or_lose.innerHTML = `
+          <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
+          <br>
+          <div class="text-center" style="margin-top: 10px;">
+            <button class="btn btn-primary mr-2" onclick="gotToCollect()">Collect</button>
+            <button class="btn btn-success" onclick="closePopPup()">Play</button>
+          </div>
+        `
+      } else {
+        win_or_lose.innerHTML = ` 
+          <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
+          <br>
+          <p>Contact admin for your reward. Screenshot this for the proof.</p>
+          <div class="text-center" style="margin-top: 10px">
+            <button class="btn btn-success" onclick="closePopPup()">Play</button>
+          </div>
+        `
+      }
+    })
   }
 
   function lose () {
-    is_playing = true
-    roleta_lose_audio.play()
-    win_or_lose.style = 'display: block'
-    win_or_lose.innerHTML = ` 
-      <h3 class="text-danger">You lose, Try another spin.</h3>
-      <div class="text-center" style="margin-top: 10px">
-        <button class="btn btn-default" onclick="closePopPup()">close</button>
-      </div>
-    `
+    httpPost(updateRoletaUrl, null, function () {
+      is_playing = true
+      roleta_lose_audio.play()
+      win_or_lose.style = 'display: block'
+      win_or_lose.innerHTML = ` 
+        <h3 class="text-danger">You lose, try another spin.</h3>
+        <div class="text-center" style="margin-top: 10px">
+          <button class="btn btn-success" onclick="closePopPup()">Play</button>
+        </div>
+      `
+    })
   }
 
   function rotate () {
@@ -483,7 +543,6 @@ function roletaGame (roleta_game) {
       is_spinning = true
       roleta_spin_audio.play()
       angVel = rand(1, 5)
-      httpPost(updateRoletaUrl, null, function () {})
     }
   })
 }
@@ -512,6 +571,8 @@ function setSpinSize() {
         bonus_plugin.innerHTML = html
         var body = document.querySelector('body')
         body.append(bonus_plugin)
+
+        initBonusSettings()
       })
     }
   }, 1e3)

@@ -16,6 +16,7 @@ exports.update = async (db_device, customer) => {
 
   const roleta_user = await models.RoletaUser.findOne({
     where: {
+      machine_id,
       mobile_device_id: db_device.db_instance.id,
       customer_id: customer.id
     }

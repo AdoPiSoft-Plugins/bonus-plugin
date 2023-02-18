@@ -4,12 +4,11 @@ const roleta_game = require('../services/roleta_game.js')
 
 exports.init = async (req, res, next) => {
   try {
-    const cfg = await config.read()
     let { device, customer } = req
 
     customer = customer || {id: null} 
     const bonus = await bonus_sessions.load(device, customer)
-    res.json({bonus, config: cfg})
+    res.json(bonus)
   } catch (e) {
     next(e)
   }

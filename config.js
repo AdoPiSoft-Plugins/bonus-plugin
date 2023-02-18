@@ -13,8 +13,6 @@ exports.read = async () => {
 
   if (cfg.certain_amount) {
     cfg.certain_amount.bonus_amount_needed = parseInt(cfg.certain_amount.bonus_amount_needed)
-    cfg.certain_amount.bonus_mb = parseInt(cfg.certain_amount.bonus_mb)
-    cfg.certain_amount.bonus_minutes = parseInt(cfg.certain_amount.bonus_minutes)
   }
 
   cfg.roleta_game = cfg.roleta_game || null
