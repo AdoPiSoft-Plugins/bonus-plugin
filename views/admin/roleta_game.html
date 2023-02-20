@@ -124,22 +124,22 @@
           <label class="control-label">Reward Text: </label>
           <input type="text" name="prize_text" class="form-control" ng-model="$ctrl.new_prize.prize_text" 
           placeholder="Sample: {{$ctrl.selected !== 'admin_prize' ? $ctrl.selected === 'time' ? $ctrl.new_prize.bonus_minutes + ' minute/s free session' : $ctrl.new_prize.bonus_mb + ' MB free session'  : 'Free Voucher from Admin, Free 1 Peso'}}"
-          maxlength="25"  
+          maxlength="23"
           required>
         </span>
         <span ng-if="$ctrl.new_prize.has_prize === 'No'">
           <label class="control-label">No Reward Text: </label>
           <input ng-if="$ctrl.new_prize.has_prize === 'No'" type="text" name="prize_text" class="form-control" ng-model="$ctrl.new_prize.prize_text" 
           placeholder="Bokya, No Reward" 
-          maxlength="25" 
+          maxlength="23"
           required>
         </span>
         <span class="help-block" ng-if="roletaGameForm.prize_text.$error.required">
             It is required
         </span>
 
-        <span class="help-block" ng-if="$ctrl.new_prize.prize_text.length >= 25">
-            Maximum letters of 25
+        <span class="help-block" ng-if="$ctrl.new_prize.prize_text.length >= 23">
+            Maximum letters of 23
           </span>
       </div>
       <button class="btn btn-success padd-top padd-bottom" type="submit" 

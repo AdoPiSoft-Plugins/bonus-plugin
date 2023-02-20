@@ -134,7 +134,7 @@ function convertCredits (time) {
   var text = sec.seconds + ' sec'
   if (sec.minutes > 0) text = sec.minutes + ' min' + ' and ' + text
   if (sec.hours > 0) text = sec.hours + ' hr' + (sec.minutes > 0 ? ', ' : ' and ') + text
-  if (sec.days > 0) text = sec.days + ' day' + (sec.days > 1 ? 's' : '') + (sec.hours > 0 || sec.minutes > 0 ? ', ' : ' and ')
+  if (sec.days > 0) text = sec.days + ' day' + (sec.days > 1 ? 's' : '') + (sec.hours > 0 || sec.minutes > 0 ? ', ' : ' and ') + text
   return text
 }
 
