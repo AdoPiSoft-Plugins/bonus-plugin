@@ -518,7 +518,7 @@ function roletaGame (roleta_game) {
   function frame () {
     if (!angVel) return
     angVel *= friction // Decrement velocity by friction
-    if (angVel < 0.002) {
+    if (angVel < 0.0005) {
       angVel = 0 // Bring to stop
       roleta_spin_audio.stop()
       is_playing = false
