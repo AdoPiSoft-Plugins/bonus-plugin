@@ -1,5 +1,5 @@
 const config = require('../config.js')
-const bonus_sessions = require('../services/bonus_sessions.js')
+const roleta_game = require('../services/roleta_game.js')
 
 exports.get = async (req, res, next) => {
   try {
@@ -43,6 +43,12 @@ exports.deleteSound = async (req, res, next) => {
   }
 }
 
-exports.reset = async (req, res, next) => {
-  
+exports.resetSpin = async (req, res, next) => {
+  try {
+    await roleta_game.resetSpin()
+    res.json({success: true})
+  } catch (e) {
+    console.log(e)
+    next(e)
+  }
 }

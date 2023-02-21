@@ -5,15 +5,13 @@ const core = require('../../core')
 const { machine_id, dbi, sessions_manager, bandwidth_cfg} = core
 
 exports.load = async (device, customer) => {
-  const { models, Sequelize} = dbi
-  const { Op } = Sequelize
   let cfg = await config.read()
   const { enable_bonus, certain_amount } = cfg
 
   if (enable_bonus && certain_amount && certain_amount.enable) {
     exports.setDate(certain_amount)
 
-    const { bonus_amount_needed, bonus_mb, bonus_minutes } = certain_amount
+    const { bonus_amount_needed } = certain_amount
     const total_amount = await exports.findTotalAmount(device.db_instance.id, customer)
 
     if (total_amount >= bonus_amount_needed) {
@@ -21,13 +19,11 @@ exports.load = async (device, customer) => {
     } else {
       cfg.can_play = false
     }
-    
   } else {
     cfg.can_play = true
   }
 
   await config.save(cfg)
-  
   return exports.list(device.db_instance.id, customer)
 }
 
@@ -43,7 +39,7 @@ exports.list = async (device_id, customer) => {
     }
   })
 
-  return { bonus: bonus_sessions.map(item => item), config: cfg} 
+  return { bonus: bonus_sessions.map(item => item), config: cfg}
 }
 
 exports.setDate = (certain_amount) => {
@@ -116,7 +112,6 @@ exports.collect = async (params, device, customer) => {
 exports.addBonus = async (params, device, customer) => {
   const { models } = dbi
   const { bonus_minutes, bonus_mb } = params
-  
   await models.BonusSession.create({
     machine_id,
     mobile_device_id: device.db_instance.id,

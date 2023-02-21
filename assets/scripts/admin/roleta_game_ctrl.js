@@ -120,7 +120,7 @@
               btnClass: 'btn-danger',
               keys: ['enter'],
               action: function () {
-                $http.post('/bonus-plugin/roleta-game/reset-spin').then(() => {
+                $http.post('/bonus-plugin-settings/roleta-game/reset-spin').then(() => {
                   toastr.success('Successfully reset users spin')
                   getConfig()
                 })
