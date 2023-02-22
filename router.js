@@ -24,7 +24,8 @@ router.post('/bonus-plugin-settings/roleta-game/sounds/delete',
   }), bodyParser.json(), admin_ctrl.deleteSound)
 
 router.post('/bonus-plugin-settings/roleta-game/reset-spin', admin_ctrl.resetSpin)
-
+router.get('/bonus-plugin-settings/get-bonus-logs', admin_ctrl.getBonusLogs)
+router.delete('/bonus-plugin-settings/clear-bonus-logs', admin_ctrl.clearLogs)
 router.get('/bonus-plugin/portal/all', ipv4, device_reg, current_customer, portal_ctrl.init)
 router.post('/bonus-plugin/portal/collect', ipv4, device_reg, current_customer,
   express.urlencoded({
@@ -32,7 +33,7 @@ router.post('/bonus-plugin/portal/collect', ipv4, device_reg, current_customer,
   }), bodyParser.json(), portal_ctrl.collect)
 
 router.get('/bonus-plugin/portal/roleta-game/spin-left', ipv4, device_reg, current_customer, portal_ctrl.getSpinLeft)
-router.post('/bonus-plugin/portal/roleta-game/update', ipv4,  device_reg, current_customer, portal_ctrl.update)
+router.post('/bonus-plugin/portal/roleta-game/update', ipv4,  device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.update)
 router.post('/bonus-plugin/portal/roleta-game/add-bonus', ipv4, device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.addBonus)
 
 module.exports = router

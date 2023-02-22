@@ -1,0 +1,43 @@
+<br>
+<div class="row padd-top">
+  <div class="col-md-4 pull-left">
+    <div class="d-flex">
+      <button class="btn btn-warning" ng-click="loadLogs()">Refresh</button>
+      <button class="btn btn-danger" ng-click="clearLogs()">Clear Logs</button>
+    </div>
+  </div>
+  <div class="col-md-4 pull-right">
+    <div class="form-horizontal">
+      <div class="form-group">
+        <div class="col-sm-12">
+          <div class="input-group">
+            <span class="input-group-addon input-group-addon-primary addon-left" id="basic-addon">
+              <i class="fa fa-search"></i>
+            </span>
+            <input type="text" class="form-control" ng-model="q" placeholder="Search mac_address or activity log text" aria-describedby="basic-addon" ng-change="loadLogs()">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row padd-bottom padd-top scrollable-x">
+  <div class="col-md-12">
+    <div ng-hide="bonus_logs.length > 0">
+      <p><strong>No logs to show.</strong></p>
+    </div>
+    <table class="table table-striped table-hover" ng-show="bonus_logs.length > 0">
+      <thead>
+        <th>Bonus Logs</th>
+        <th style="width: 200px">Date/Time</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="log in bonus_logs">
+          <td><pre style="margin-bottom: 0px">[{{log.MobileDevice.mac_address}}] {{log.text}}</pre></td>
+          <td style="vertical-align: middle;">{{log.created_at | date: 'yyyy-MM-dd h:mm:ss a'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<ul ng-show="bonus_logs.length > 0" uib-pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" ng-change="loadLogs()" items-per-page="perPage" class="pagination-sm" boundary-link-number="true" rotate="false"></ul>

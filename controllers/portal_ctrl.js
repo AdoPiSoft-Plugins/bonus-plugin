@@ -43,9 +43,12 @@ exports.getSpinLeft = async (req, res, next) => {
 }
 exports.update = async (req, res, next) => {
   try {
+    const { game, prize_log_text } = req.body
+
     let { device, customer } = req
     customer = customer || {id: null}
-    await roleta_game.update(device, customer)
+    await roleta_game.update(device, customer, game, prize_log_text)
+
     res.json({success: true})
   } catch (e) {
     console.log(e)

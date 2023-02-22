@@ -1,6 +1,7 @@
 const config = require('../config.js')
 const moment = require('moment')
 const core = require('../../core.js')
+const bonus_logger = require('../bonus_logger.js')
 
 const { machine_id, dbi} = core
 
@@ -11,7 +12,7 @@ exports.get = async (db_device, customer) => {
   return left_spin >= 0 ? left_spin : 0
 }
 
-exports.update = async (db_device, customer) => {
+exports.update = async (db_device, customer, game, prize_log_text) => {
   const { models } = dbi
 
   const roleta_user = await models.RoletaUser.findOne({
@@ -34,6 +35,9 @@ exports.update = async (db_device, customer) => {
     //update
     await roleta_user.update({spinned: roleta_user.spinned + 1})
   }
+
+  const text = `User(${customer.id ? customer.username : db_device.db_instance.mac_address}) won ${prize_log_text} in ${game}.`
+  await bonus_logger.create(db_device.db_instance.id, text)
 }
 
 exports.getRoletaUser = async (cfg, db_device, customer) => {

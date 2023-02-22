@@ -221,7 +221,7 @@ function setBonusGame (game_div) {
     for (const item of game_type) {
       if (config && config.hasOwnProperty(item)) {
 
-        if (item === 'roleta_game' &&  config.roleta_game && config.roleta_game.prizes.length > 2) {
+        if (item === 'roleta_game' &&  config.roleta_game && config.roleta_game.prizes.length > 2 && config.roleta_game.max_spin) {
           const ct = `<span><strong>Roleta Game</strong>, you can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Play </span> <a onclick="initRoleta()">here.</a>`
           games.push(ct)
         }
@@ -457,8 +457,16 @@ function roletaGame (roleta_game) {
   }
 
   function winner (prize) {
-    httpPost(updateRoletaUrl, null, function () {
-      const {is_admin_prize, bonus_minutes, bonus_mb, prize_text} = prize
+    let prize_log_text = ''
+    const {is_admin_prize, bonus_minutes, bonus_mb, prize_text} = prize
+
+    if (!is_admin_prize) {
+      prize_log_text = (bonus_minutes > 0 ? convertCredits(bonus_minutes) : bonus_mb.toFixed(2) + 'MB') + ' free session'
+    } else {
+      prize_log_text = `Admin Prize(${prize_text})`
+    }
+
+    httpPost(updateRoletaUrl, {game: 'Roleta Game', prize_log_text}, function () {
       is_playing = true
       roleta_win_audio.play()
       win_or_lose.style = 'display: block'
