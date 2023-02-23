@@ -2,9 +2,12 @@
   'use strict'
   angular.module('adopisoft')
     .component('roletaGame', {
+      bindings: {
+        onsave: '&'
+      },
       controller: 'RoletaGameCtrl',
       templateUrl: '/plugins/bonus-plugin/views/admin/roleta_game.html'
-    }).controller('RoletaGameCtrl', function ($scope, $http, CatchHttpError, SettingsSavedToastr, toastr, Upload, $ngConfirm) {
+    }).controller('RoletaGameCtrl', function ($http, CatchHttpError, SettingsSavedToastr, toastr, Upload, $ngConfirm) {
       var $ctrl = this
       $ctrl.has_prize_options = ['Yes', 'No']
 
@@ -32,8 +35,7 @@
       }
 
       $ctrl.saveSettings = (call) => {
-        const cfg =  $ctrl.settings
-        cfg.roleta_game = $ctrl.roleta
+        const roleta_game = $ctrl.roleta
         if (call === 2) {
           let new_p = $ctrl.new_prize
           new_p.has_prize = new_p.has_prize === 'Yes'
@@ -55,18 +57,18 @@
             new_p.is_admin_prize = false
           }
 
-          cfg.roleta_game.prizes.push(new_p)
+          roleta_game.prizes.push(new_p)
         }
 
-        $http.post('/bonus-plugin-settings', cfg).then(() => {
-          if (call == 1) SettingsSavedToastr()
-          else {
-            toastr.success('Prize successfully added')
-            $ctrl.defaultPrizeField()
-          }
+        $ctrl.onsave({new_settings: roleta_game, req_from: 'roleta_game'})
+          .then(() => {
+            if (call !== 1) {
+              toastr.success('Prize successfully added')
+              $ctrl.defaultPrizeField()
+            }
 
-          getConfig()
-        }).catch(CatchHttpError)
+            getConfig()
+          })
       }
 
       $ctrl.deletePrize = (index) => {
@@ -134,7 +136,9 @@
         })
       }
 
-      $ctrl.defaultPrizeField()
-      getConfig()
+      $ctrl.$onInit = () => {
+        $ctrl.defaultPrizeField()
+        getConfig()
+      }
     })
 })()

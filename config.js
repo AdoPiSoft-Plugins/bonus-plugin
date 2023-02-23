@@ -9,6 +9,7 @@ const sounds_dir_path = path.join(__dirname)
 exports.read = async () => {
 
   let cfg = (await fs.promises.readFile(cfg_path, "utf8")) || {};
+  console.log("GG: ", cfg)
   cfg = JSON.parse(cfg)
 
   if (cfg.certain_amount) {

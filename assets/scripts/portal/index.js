@@ -1,8 +1,8 @@
-const getAllBonusUrl = '/bonus-plugin/portal/all'
-const collectUrl = '/bonus-plugin/portal/collect'
-const getSpinUrl = '/bonus-plugin/portal/roleta-game/spin-left'
-const updateRoletaUrl = '/bonus-plugin/portal/roleta-game/update'
-const addRoletaBonusUrl = '/bonus-plugin/portal/roleta-game/add-bonus'
+var getAllBonusUrl = '/bonus-plugin/portal/all'
+var collectUrl = '/bonus-plugin/portal/collect'
+var getSpinUrl = '/bonus-plugin/portal/roleta-game/spin-left'
+var updateRoletaUrl = '/bonus-plugin/portal/roleta-game/update'
+var addRoletaBonusUrl = '/bonus-plugin/portal/roleta-game/add-bonus'
 
 var roleta_spin_audio
 var roleta_win_audio
@@ -68,7 +68,7 @@ function closeBonus () {
   if (!is_spinning && !clicked_roleta) {
     document.querySelector('.bonus-main-icon').style = 'display: block'
     document.querySelector('.bonus-container').style = 'display: none'
-    const complete_challenge_text = document.querySelector('.complete-challenge-text')
+    var complete_challenge_text = document.querySelector('.complete-challenge-text')
     if (complete_challenge_text) {
       complete_challenge_text.remove()
     }
@@ -78,8 +78,8 @@ function closeBonus () {
 }
 
 function createTable () {
-  const rewards_div = document.querySelector('.rewards-div')
-  const tableHeader = ['No.', 'Type', 'Credits', 'Option']
+  var rewards_div = document.querySelector('.rewards-div')
+  var tableHeader = ['No.', 'Type', 'Credits', 'Option']
   let table = document.createElement('table')
   table.className = 'table table-striped bonus-table'
   let thead = document.createElement('thead')
@@ -95,15 +95,15 @@ function createTable () {
   table.append(thead)
   rewards_div.append(table)
 
-  for (const item of fetchedData.bonus) {
-    const index = fetchedData.bonus.indexOf(item) + 1
+  for (var item of fetchedData.bonus) {
+    var index = fetchedData.bonus.indexOf(item) + 1
     appendTableBody(item, index)
   }
 }
 
 function appendTableBody (item, index) {
-  const table = document.querySelector('.bonus-table')
-  const tbody = document.createElement('tbody')
+  var table = document.querySelector('.bonus-table')
+  var tbody = document.createElement('tbody')
   let tbodyRow = document.createElement('tr')
 
   let noTd = document.createElement('td')
@@ -116,7 +116,7 @@ function appendTableBody (item, index) {
   creditsTd.innerText = item.bonus_mb ? item.bonus_mb.toFixed(2) + 'MB' : convertCredits(item.bonus_minutes)
   optionTd.innerHTML = '<button class="btn btn-warning btn-sm">Collect</button>'
 
-  const btn = optionTd.firstChild
+  var btn = optionTd.firstChild
 
   btn.onclick = function () {
     collect(item, btn)
@@ -128,7 +128,7 @@ function appendTableBody (item, index) {
 }
 
 function convertCredits (time) {
-  const c_second = time * 60
+  var c_second = time * 60
 
   let sec = formatTime(c_second)
   var text = sec.seconds + ' sec'
@@ -158,11 +158,11 @@ function formatTime (secs) {
 }
 
 function initBonusSettings (cb) {
-  const loading_div = document.querySelector('.loading')
-  const bonus_list = document.querySelector('.bonus-list')
-  const no_reward = document.createElement('p')
-  const rewards_div = document.querySelector('.rewards-div')
-  const disabled_bonus_div = document.querySelector('.disabled-bonus')
+  var loading_div = document.querySelector('.loading')
+  var bonus_list = document.querySelector('.bonus-list')
+  var no_reward = document.createElement('p')
+  var rewards_div = document.querySelector('.rewards-div')
+  var disabled_bonus_div = document.querySelector('.disabled-bonus')
 
   no_reward.className = 'text-danger'
   loading_div.style = 'display: block; padding-left: 10px'
@@ -213,41 +213,41 @@ function collect (bonus, btn) {
 
 function setBonusGame (game_div) {
   let games = []
-  const game_type = ['roleta_game'] // add here the added game
+  var game_type = ['roleta_game'] // add here the added game
   game_div.innerHTML = ''
-  const config = fetchedData.config
+  var config = fetchedData.config
 
   if (config.can_play) {
-    for (const item of game_type) {
+    for (var item of game_type) {
       if (config && config.hasOwnProperty(item)) {
 
         if (item === 'roleta_game' &&  config.roleta_game && config.roleta_game.prizes.length > 2 && config.roleta_game.max_spin) {
-          const ct = `<span><strong>Roleta Game</strong>, you can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Play </span> <a onclick="initRoleta()">here.</a>`
+          var ct = `<span><strong>Roleta Game</strong>, you can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Play </span> <a onclick="initRoleta()">here.</a>`
           games.push(ct)
         }
       }
     }
     if (games.length > 0) {
-      for (const item of games) {
-        const index = games.indexOf(item) + 1
-        const p = document.createElement('p')
+      for (var item of games) {
+        var index = games.indexOf(item) + 1
+        var p = document.createElement('p')
         p.className = 'p_element'
         p.innerHTML = index + '. ' + item
         game_div.append(p)
       }
     } else {
-      const p = document.createElement('p')
+      var p = document.createElement('p')
       p.className = 'alert alert-danger'
       p.innerHTML = 'No game, contact admin to add game.'
       game_div.append(p)
     }
   } else if(!config.can_play && config.certain_amount) {
-    const p = document.createElement('p')
+    var p = document.createElement('p')
     p.className = 'alert alert-info'
     p.innerHTML = `Pay more than or equal to ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')}, to play the game/s.`
     game_div.append(p)
   } else {
-    const p = document.createElement('p')
+    var p = document.createElement('p')
     p.className = 'alert alert-danger'
     p.innerHTML = '<a href="javascript:window.location.reload()">Something went wrong? Click here to reload the page</a>'
     game_div.append(p)
@@ -256,11 +256,11 @@ function setBonusGame (game_div) {
 }
 
 function tabClick (i) {
-  const game_div = document.querySelector('.game-div')
-  const rewards_div = document.querySelector('.rewards-div')
-  const rewards_a = document.querySelector('.rewards')
-  const game_a = document.querySelector('.game')
-  const refresh_btn = document.querySelector('#refresh-btn')
+  var game_div = document.querySelector('.game-div')
+  var rewards_div = document.querySelector('.rewards-div')
+  var rewards_a = document.querySelector('.rewards')
+  var game_a = document.querySelector('.game')
+  var refresh_btn = document.querySelector('#refresh-btn')
   if (i === 1) {
     rewards_div.style.display = 'block'
     refresh_btn.style.display = 'block'
@@ -298,24 +298,24 @@ function initRoleta () {
   document.querySelector('.roleta-game-main').style.display = 'none'
   document.querySelector('.loading-roleta').style.display = 'block'
 
-  const roleta_game_div = document.querySelector('.roleta-game')
+  var roleta_game_div = document.querySelector('.roleta-game')
   roleta_game_div.style = 'display: block'
 
   httpGet(getAllBonusUrl, function (data) {
     fetchedData = JSON.parse(data)
-    const { roleta_game, can_play } = fetchedData.config
+    var { roleta_game, can_play } = fetchedData.config
 
     if (!can_play) {
       clicked_roleta = false
       document.querySelector('.loading-roleta').style.display = 'none'
-      const p = document.createElement('p')
+      var p = document.createElement('p')
       p.className = 'alert alert-danger text-center complete-challenge-text'
       p.innerHTML = '<a onclick="refresh()">Ooops, complete the challenge first!</a>'
       roleta_game_div.append(p)
       return;
     }
 
-    const { spin_bg_sound, winner_sound, loser_sound } = roleta_game ? roleta_game.sounds : {}
+    var { spin_bg_sound, winner_sound, loser_sound } = roleta_game ? roleta_game.sounds : {}
     if (spin_bg_sound && winner_sound && loser_sound) {
       roleta_spin_audio = setSound('spin', spin_bg_sound)
       roleta_win_audio = setSound('win', winner_sound)
@@ -333,10 +333,10 @@ function initRoleta () {
 }
 
 function refresh() {
-  const game_div = document.querySelector('.game-div')
-  const roleta_game_div = document.querySelector('.roleta-game')
+  var game_div = document.querySelector('.game-div')
+  var roleta_game_div = document.querySelector('.roleta-game')
   roleta_game_div.style.display = 'none'
-  const complete_challenge_text = document.querySelector('.complete-challenge-text')
+  var complete_challenge_text = document.querySelector('.complete-challenge-text')
   if (complete_challenge_text) {
     complete_challenge_text.remove()
   }
@@ -346,7 +346,7 @@ function refresh() {
 }
 
 function setSound (dir, file_name) {
-  const url = '/plugins/bonus-plugin/assets//sounds/' + dir + '/' + file_name
+  var url = '/plugins/bonus-plugin/assets//sounds/' + dir + '/' + file_name
   return new Howl({
     src: [url],
     loop: false,
@@ -380,7 +380,7 @@ function getSpinLeft () {
     clicked_roleta = false
 
     if (spin_left <= 0 && !is_display_win_or_lose) {
-      const running_out_of_spin = document.querySelector('.running-out-spin')
+      var running_out_of_spin = document.querySelector('.running-out-spin')
       running_out_of_spin.style.display = 'block'
       running_out_of_spin.innerHTML = `
         <h3 class="text-danger">You're running out of spin. Try again ${resetAfter()}.</h3>
@@ -393,19 +393,19 @@ function getSpinLeft () {
 }
 
 function resetAfter () {
-  const {roleta_game} = fetchedData.config
-  const {reset_spin_after} = roleta_game
+  var {roleta_game} = fetchedData.config
+  var {reset_spin_after} = roleta_game
   if (reset_spin_after === 'today') return 'tomorrow'
   else if (reset_spin_after === 'this_week') return 'next week'
   else if (reset_spin_after === 'this_month') return 'next month'
 }
 
 function gotToCollect () {
-  const game_div = document.querySelector('.game-div')
-  const rewards_div = document.querySelector('.rewards-div')
-  const rewards_a = document.querySelector('.rewards')
-  const game_a = document.querySelector('.game')
-  const refresh_btn = document.querySelector('#refresh-btn')
+  var game_div = document.querySelector('.game-div')
+  var rewards_div = document.querySelector('.rewards-div')
+  var rewards_a = document.querySelector('.rewards')
+  var game_a = document.querySelector('.game')
+  var refresh_btn = document.querySelector('#refresh-btn')
 
   rewards_div.style.display = 'block'
   refresh_btn.style.display = 'block'
@@ -419,25 +419,25 @@ function gotToCollect () {
 
 function roletaGame (roleta_game) {
   getSpinLeft()
-  const prizes = roleta_game.prizes
-  const rand = (m, M) => Math.random() * (M - m) + m
-  const all_prizes = prizes.length
-  const wheel_spin = document.querySelector('#spin')
-  const wheel = document.querySelector('#wheel').getContext('2d')
-  const win_or_lose = document.querySelector('.win-or-lose-div')
-  const dia = wheel.canvas.width
-  const rad = dia / 2
-  const PI = Math.PI
-  const TAU = 2 * PI
-  const arc = TAU / prizes.length
-  const friction = 0.995
+  var prizes = roleta_game.prizes
+  var rand = (m, M) => Math.random() * (M - m) + m
+  var all_prizes = prizes.length
+  var wheel_spin = document.querySelector('#spin')
+  var wheel = document.querySelector('#wheel').getContext('2d')
+  var win_or_lose = document.querySelector('.win-or-lose-div')
+  var dia = wheel.canvas.width
+  var rad = dia / 2
+  var PI = Math.PI
+  var TAU = 2 * PI
+  var arc = TAU / prizes.length
+  var friction = 0.995
   let angVel = 0
   let ang = 0
 
-  const getIndex = () => Math.floor(all_prizes - ang / TAU * all_prizes) % all_prizes
+  var getIndex = () => Math.floor(all_prizes - ang / TAU * all_prizes) % all_prizes
 
   function drawSector (sector, i) {
-    const ang = arc * i
+    var ang = arc * i
     wheel.save()
 
     wheel.beginPath()
@@ -458,59 +458,50 @@ function roletaGame (roleta_game) {
 
   function winner (prize) {
     let prize_log_text = ''
-    const {is_admin_prize, bonus_minutes, bonus_mb, prize_text} = prize
+    var {is_admin_prize, bonus_minutes, bonus_mb, prize_text} = prize
+    is_playing = true
+    roleta_win_audio.play()
+    win_or_lose.style = 'display: block'
 
     if (!is_admin_prize) {
       prize_log_text = (bonus_minutes > 0 ? convertCredits(bonus_minutes) : bonus_mb.toFixed(2) + 'MB') + ' free session'
+      win_or_lose.innerHTML = `
+        <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
+        <br>
+        <div class="text-center" style="margin-top: 10px;">
+          <button class="btn btn-primary mr-2" onclick="gotToCollect()">Collect</button>
+          <button class="btn btn-success" onclick="closePopPup()">Play</button>
+        </div>
+      `
     } else {
       prize_log_text = `Admin Prize(${prize_text})`
-    }
-
-    httpPost(updateRoletaUrl, {game: 'Roleta Game', prize_log_text}, function () {
-      is_playing = true
-      roleta_win_audio.play()
-      win_or_lose.style = 'display: block'
-
-      if (!is_admin_prize) {
-        httpPost(addRoletaBonusUrl, {bonus_minutes, bonus_mb}, function () {})
-
-        win_or_lose.innerHTML = `
-          <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
-          <br>
-          <div class="text-center" style="margin-top: 10px;">
-            <button class="btn btn-primary mr-2" onclick="gotToCollect()">Collect</button>
-            <button class="btn btn-success" onclick="closePopPup()">Play</button>
-          </div>
-        `
-      } else {
-        win_or_lose.innerHTML = ` 
-          <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
-          <br>
-          <p>Contact admin for your reward. Screenshot this for the proof.</p>
-          <div class="text-center" style="margin-top: 10px">
-            <button class="btn btn-success" onclick="closePopPup()">Play</button>
-          </div>
-        `
-      }
-    })
-  }
-
-  function lose () {
-    httpPost(updateRoletaUrl, null, function () {
-      is_playing = true
-      roleta_lose_audio.play()
-      win_or_lose.style = 'display: block'
       win_or_lose.innerHTML = ` 
-        <h3 class="text-danger">You lose, try another spin.</h3>
+        <h3 class="text-success">Congratulations, you won ${prize_text}!</h3>
+        <br>
+        <p>Contact admin for your reward. Screenshot this for the proof.</p>
         <div class="text-center" style="margin-top: 10px">
           <button class="btn btn-success" onclick="closePopPup()">Play</button>
         </div>
       `
-    })
+    }
+
+    httpPost(addRoletaBonusUrl, {bonus_minutes, bonus_mb, prize_log_text, game: 'Roleta Game'}, function () {})
+  }
+
+  function lose () {
+    is_playing = true
+    roleta_lose_audio.play()
+    win_or_lose.style = 'display: block'
+    win_or_lose.innerHTML = ` 
+      <h3 class="text-danger">You lose, try another spin.</h3>
+      <div class="text-center" style="margin-top: 10px">
+        <button class="btn btn-success" onclick="closePopPup()">Play</button>
+      </div>
+      `
   }
 
   function rotate () {
-    const sector = prizes[getIndex()]
+    var sector = prizes[getIndex()]
     wheel.canvas.style.transform = `rotate(${ang - PI / 2}rad)`
     wheel_spin.style.background = sector.color
     if (!angVel && is_spinning) {
@@ -551,14 +542,16 @@ function roletaGame (roleta_game) {
       is_spinning = true
       roleta_spin_audio.play()
       angVel = rand(1, 5)
+
+      httpPost(updateRoletaUrl, null, function () {})
     }
   })
 }
 
 function setSpinSize() {
-  const config = fetchedData.config
+  var config = fetchedData.config
   if (config.roleta_game && config.roleta_game.prizes) {
-    const wheel_spin = document.querySelector('#spin')
+    var wheel_spin = document.querySelector('#spin')
     if (config.roleta_game.prizes.length > 15) {
       wheel_spin.style.font = "12px sans-serif"
       wheel_spin.style.width  = "12%"

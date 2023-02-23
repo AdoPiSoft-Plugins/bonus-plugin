@@ -15,13 +15,13 @@
         <hr/>
         <br>
         <div ng-if="settings.enable_bonus">
-          <certain-amount></certain-amount>
+          <certain-amount onsave="onSave(new_settings, req_from)"></certain-amount>
           <div class="panel panel-primary">
             <div class="panel-heading">Bonus game</div>
             <div class="panel-body">
               <uib-tabset>
                 <uib-tab heading="Roleta Game">
-                  <roleta-game></roleta-game>
+                  <roleta-game onsave="onSave(new_settings, req_from)"></roleta-game>
                 </uib-tab>
                 <uib-tab heading="New Game">
                   <div class="padd-top">

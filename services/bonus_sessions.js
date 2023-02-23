@@ -1,6 +1,7 @@
 const config = require('../config.js')
 const moment = require('moment')
 const core = require('../../core')
+const bonus_logger = require('../bonus_logger.js')
 
 const { machine_id, dbi, sessions_manager, bandwidth_cfg} = core
 
@@ -111,13 +112,19 @@ exports.collect = async (params, device, customer) => {
 
 exports.addBonus = async (params, device, customer) => {
   const { models } = dbi
-  const { bonus_minutes, bonus_mb } = params
-  await models.BonusSession.create({
-    machine_id,
-    mobile_device_id: device.db_instance.id,
-    bonus_mb,
-    bonus_minutes,
-    type: 'roleta_game',
-    customer_id: customer.id
-  })
+  const { bonus_minutes, bonus_mb, game, prize_log_text} = params
+  
+  if ( bonus_minutes > 0 || bonus_mb > 0) {
+    await models.BonusSession.create({
+      machine_id,
+      mobile_device_id: device.db_instance.id,
+      bonus_mb,
+      bonus_minutes,
+      type: 'roleta_game',
+      customer_id: customer.id
+    })
+  }
+
+  const text = `User(${customer.id ? customer.username : device.db_instance.mac_address}) won ${prize_log_text} in ${game}.`
+  await bonus_logger.create(device.db_instance.id, text)
 }
