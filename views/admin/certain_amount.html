@@ -24,10 +24,10 @@
             ng-class="{'has-error': certainAmountForm.bonus_amount_needed.$invalid, 'has-success': certainAmountForm.bonus_amount_needed.$valid && certainAmountForm.bonus_amount_needed.$touched}">
             <label class="control-label">How much do the customer must pay?</label>
             <input type="number" name="bonus_amount_needed" ng-model="$ctrl.certain_cfg.bonus_amount_needed" class="form-control"
-              min="20" required>
+              min="5" required>
             <span class="help-block" ng-if="certainAmountForm.bonus_amount_needed.$error.required">It is required</span>
             <span class="help-block" ng-if="certainAmountForm.bonus_amount_needed.$error.min">
-              Minimum is 20
+              Minimum is 5
             </span>
           </div>
           <!-- <p><strong>Type: </strong></p>
