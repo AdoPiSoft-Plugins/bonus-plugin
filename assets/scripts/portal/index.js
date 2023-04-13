@@ -244,7 +244,8 @@ function setBonusGame (game_div) {
   } else if(!config.can_play && config.certain_amount) {
     var p = document.createElement('p')
     p.className = 'alert alert-info'
-    p.innerHTML = `Pay more than or equal to ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')}, to play the game/s.`
+    var challenge_text = config.certain_amount.custom_challenge_text ? config.certain_amount.custom_challenge_text : `Pay more than or equal to ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')}, to play the game/s.`
+    p.innerHTML = challenge_text
     game_div.append(p)
   } else {
     var p = document.createElement('p')
