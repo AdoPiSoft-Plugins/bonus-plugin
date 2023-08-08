@@ -2,7 +2,9 @@ var getAllBonusUrl = '/bonus-plugin/portal/all'
 var collectUrl = '/bonus-plugin/portal/collect'
 var getSpinUrl = '/bonus-plugin/portal/roleta-game/spin-left'
 var updateRoletaUrl = '/bonus-plugin/portal/roleta-game/update'
-var addRoletaBonusUrl = '/bonus-plugin/portal/roleta-game/add-bonus'
+var addBonusUrl = '/bonus-plugin/portal/add-bonus'
+var sessionsUrl = '/bonus-plugin/portal/coinflip/get-sessions'
+var removeSessionUrl = '/bonus-plugin/portal/coinflip/remove-session'
 
 var roleta_spin_audio
 var roleta_win_audio
@@ -15,6 +17,8 @@ var spin_left = null
 var animation
 var is_playing = false
 var clicked_roleta = false
+var coin_flip_started = false
+const coin_flip_bet = {}
 
 function httpGet (url, cb) {
   var xmlhttp
@@ -65,7 +69,7 @@ function openBonus () {
 }
 
 function closeBonus () {
-  if (!is_spinning && !clicked_roleta) {
+  if (!is_spinning && !clicked_roleta && !coin_flip_started) {
     document.querySelector('.bonus-main-icon').style = 'display: block'
     document.querySelector('.bonus-container').style = 'display: none'
     var complete_challenge_text = document.querySelector('.complete-challenge-text')
@@ -112,8 +116,8 @@ function appendTableBody (item, index) {
   let optionTd = document.createElement('td')
 
   noTd.innerText = index
-  typeTd.innerText = item.type.replace('_', ' ').toUpperCase()
-  creditsTd.innerText = item.bonus_mb ? item.bonus_mb.toFixed(2) + 'MB' : convertCredits(item.bonus_minutes)
+  typeTd.innerText = item.type.replace(/[._]/g, ' ').toUpperCase()
+  creditsTd.innerText = item.bonus_mb > 0 && item.bonus_minutes > 0 ? item.bonus_mb.toFixed(2) + 'MB or ' + convertCredits(item.bonus_minutes) : (item.bonus_mb ? item.bonus_mb.toFixed(2) + 'MB' : convertCredits(item.bonus_minutes));
   optionTd.innerHTML = '<button class="btn btn-warning btn-sm">Collect</button>'
 
   var btn = optionTd.firstChild
@@ -213,7 +217,7 @@ function collect (bonus, btn) {
 
 function setBonusGame (game_div) {
   let games = []
-  var game_type = ['roleta_game'] // add here the added game
+  var game_type = ['roleta_game', 'coin_flip'] // add here the added game
   game_div.innerHTML = ''
   var config = fetchedData.config
 
@@ -223,6 +227,10 @@ function setBonusGame (game_div) {
 
         if (item === 'roleta_game' &&  config.roleta_game && config.roleta_game.prizes.length > 2 && config.roleta_game.max_spin) {
           var ct = `<span><strong>Roleta Game</strong>, you can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Play </span> <a onclick="initRoleta()">here.</a>`
+          games.push(ct)
+        }
+        if(item === 'coin_flip' && config.coin_flip && config.coin_flip.enable){
+          var ct = `<span><strong>Coin Flip Game</strong>, you can bet your available session and have a chance to double it. Play </span> <a onclick="initCoinFlip()">here.</a>`
           games.push(ct)
         }
       }
@@ -308,6 +316,7 @@ function initRoleta () {
 
     if (!can_play) {
       clicked_roleta = false
+      coin_flip_started = false
       document.querySelector('.loading-roleta').style.display = 'none'
       var p = document.createElement('p')
       p.className = 'alert alert-danger text-center complete-challenge-text'
@@ -407,7 +416,8 @@ function gotToCollect () {
   var rewards_a = document.querySelector('.rewards')
   var game_a = document.querySelector('.game')
   var refresh_btn = document.querySelector('#refresh-btn')
-
+  document.querySelector('.coin-flip-game').style.display = 'none'
+  
   rewards_div.style.display = 'block'
   refresh_btn.style.display = 'block'
   game_div.style.display = 'none'
@@ -486,7 +496,7 @@ function roletaGame (roleta_game) {
       `
     }
 
-    httpPost(addRoletaBonusUrl, {bonus_minutes, bonus_mb, prize_log_text, game: 'Roleta Game'}, function () {})
+    httpPost(addBonusUrl, {bonus_minutes, bonus_mb, prize_log_text, game: 'Roleta Game'}, function () {})
   }
 
   function lose () {
@@ -498,7 +508,7 @@ function roletaGame (roleta_game) {
       <div class="text-center" style="margin-top: 10px">
         <button class="btn btn-success" onclick="closePopPup()">Play</button>
       </div>
-      `
+    `
   }
 
   function rotate () {
@@ -561,6 +571,262 @@ function setSpinSize() {
       wheel_spin.style.left = "52%"
     }
   }
+}
+
+
+// coin_flip game
+function closeCoinFlip()
+{
+  document.querySelector('.coin-flip-game').style = 'display: none'
+  document.querySelector('.win-or-lose-div').style = 'display: none'
+  document.querySelector('.coinflip-win-or-lose-div').style = 'display: none'
+  document.querySelector('.loading-coin-flip').style = 'display: none'
+  document.querySelector('.bonus-list').style = 'display: block'
+  coin_flip_started = false;
+}
+
+function initCoinFlip()
+{
+  coin_flip_started = false;
+  document.querySelector('.loading').style = 'display: none'
+  document.querySelector('.bonus-list').style = 'display: none'
+  document.querySelector('.disabled-bonus').style = 'display: none'
+  document.querySelector('.coinflip-error-div').style.display = 'none'
+  document.querySelector('.coin-flip-game-main').style.display = 'none'
+  document.querySelector('.coinflip-win-or-lose-div').style = 'display: none'
+  document.querySelector('.coin-flip-game-main-containers').style = "pointer-events: ''; opacity: 1";
+  document.querySelector('.start-coin-btn').disabled = true;
+  document.querySelector('.session-select').disabled = true;
+  document.querySelector('.loading-coin-flip').style.display = 'block'
+
+  const tail = document.querySelector('.tail-btn')
+  tail.disabled = false;
+  tail.classList.remove('active')
+  const head = document.querySelector('.head-btn')
+  head.disabled = false;
+  head.classList.remove('active')
+
+  var roleta_game_div = document.querySelector('.roleta-game')
+  var coin_flip_game_div = document.querySelector('.coin-flip-game')
+  roleta_game_div.style = 'display: none'
+  coin_flip_game_div.style = 'display: block'
+
+  loadSessionData();
+}
+
+function loadSessionData()
+{
+  httpGet(sessionsUrl, function(data){
+    data = JSON.parse(data);
+    const sessions = data.sessions;
+    const config = data.config;
+
+    if (!config.can_play) {
+      var p = document.createElement('p')
+      p.className = 'alert alert-info'
+      var challenge_text = config.certain_amount.custom_challenge_text ? config.certain_amount.custom_challenge_text : `Pay more than or equal to ${config.certain_amount.bonus_amount_needed} pesos within ${(config.certain_amount.bonus_limit_days).replace('_', ' ')}, to play the game/s.`
+      p.innerHTML = challenge_text
+    }
+
+
+    document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/heads/" + config.coin_flip.head_icon;
+    document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/tails/" + config.coin_flip.tail_icon;
+
+    document.querySelector('.coin-flip-game-main').style.display = 'block'
+    document.querySelector('.loading-coin-flip').style.display = 'none'
+    const session_select = document.querySelector('.session-select')
+    session_select.innerHTML = "";
+
+    if(sessions.length === 0) {
+      document.querySelector('.coin-flip-game-main-containers').style = "pointer-events: none; opacity: 0.5";
+      const error_div = document.querySelector('.coinflip-error-div');
+      error_div.style.display = 'block'
+      error_div.innerHTML = `
+        <h4 class="text-danger">You have no available session yet. Make sure you have available session to play the game.</h4>
+        <button onclick="closeCoinFlip()" class="btn btn-default btn-sm" style="margin-top: 20px">Close</button>
+      `
+    }else {
+      const session_data = [{value: '', label: "-- Choose Session --"}];
+      sessions.forEach(s => {
+        var label = "";
+        s.time_seconds = Math.floor(s.time_seconds/60);
+        if(s.type === 'time_or_data' ){
+          label = convertCredits(s.time_seconds) + ' or ' + s.data_mb.toFixed(2) + 'MB'
+        }else if(s.type === 'time' || s.type === 'data') {
+          label = s.data_mb ? s.data_mb.toFixed(2) + 'MB' : convertCredits(s.time_seconds);
+        }
+        session_data.push({
+          value: s.id,
+          label: label
+        })
+      })
+      session_data.forEach(item => {
+        const option = document.createElement('option');
+        option.setAttribute('value', item.value)
+        option.textContent = item.label;
+        session_select.appendChild(option)
+      });
+
+      session_select.addEventListener('change', function(){
+        const start_coin_btn = document.querySelector('.start-coin-btn');
+        if(session_select.value){
+          coin_flip_bet.session = {
+            value: session_select.value,
+            label: this.options[this.selectedIndex].text
+          }
+
+          start_coin_btn.disabled = false
+        }else{
+          coin_flip_bet.session = null
+        }
+      })
+    }
+  })
+}
+
+function chooseCoinClick(e){
+  const targetElement = event.target;
+  const is_head = targetElement.classList.contains('head-btn');
+  const is_tail = targetElement.classList.contains('tail-btn');
+  const session_select = document.querySelector('.session-select');
+  if(is_head)
+  {
+    const tail = document.querySelector('.tail-btn')
+    tail.classList.remove('active')
+    targetElement.classList.add('active');
+    coin_flip_bet.choosenCoin = "head";
+    session_select.disabled = false;
+
+  }
+  else if(is_tail){
+    const head = document.querySelector('.head-btn')
+    head.classList.remove('active')
+    targetElement.classList.add('active');
+    coin_flip_bet.choosenCoin = "tail";
+    session_select.disabled = false
+
+  }else {
+    session_select.disabled = true
+    coin_flip_bet.choosenCoin = null
+  }
+}
+
+function startCoinFlip()
+{
+
+  if(!coin_flip_bet || !coin_flip_bet.choosenCoin || !coin_flip_bet.session){
+    return alert('You must have choosen bet!');
+  }
+
+  coin_flip_started = true;
+  const start_coin_btn = document.querySelector('.start-coin-btn');
+  start_coin_btn.innerText = 'Processing ...'
+  document.querySelector('.coin-flip-game-main-containers').style = "pointer-events: none; opacity: 0.5";
+
+  httpGet(sessionsUrl, function(data){
+    data = JSON.parse(data)
+    const sessions = data.sessions;
+    const config = data.config;
+    document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/heads/" + config.coin_flip.head_icon;
+    document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/tails/" + config.coin_flip.tail_icon;
+    
+    const bet_session = (sessions.filter(s => s.id == coin_flip_bet.session.value) || {})[0];
+    if(!bet_session || bet_session.status !== 'available'){
+      const error_div = document.querySelector('.coinflip-error-div');
+      error_div.style.display = 'block'
+      error_div.innerHTML = `
+        <h4 class="text-danger">Your bet session is not available, please make sure you have available session.</h4>
+        <button onclick="closeCoinFlip()" class="btn btn-default btn-sm" style="margin-top: 20px">Close</button>
+      `
+      start_coin_btn.innerText = 'Flip Coin'
+      return;
+    }
+    const coin_div = document.querySelector('.coin-div');
+    const head = document.querySelector('.front-image');
+    const tail = document.querySelector('.back-image');
+    const winner_div = document.querySelector('.winner-div');
+
+    tail.style.display = 'block'
+    head.style.display = 'block'
+
+    coin_div.classList.add('flip')
+
+    setTimeout( async () => {
+      
+      start_coin_btn.innerText = "Flip Coin"
+      coin_div.classList.remove('flip');
+
+      const result = Math.random() < 0.5 ? "head" : "tail"; 
+
+      if(result === 'head'){
+        tail.style.display = 'none';
+      }
+      if(result === 'tail') {
+        head.style.display = 'none';
+      }
+
+      setTimeout(() => {
+        coin_flip_started = false;
+        bet_session.label = coin_flip_bet.session.label;
+        if(result === coin_flip_bet.choosenCoin){
+          winCoinFlip(result.toUpperCase(), bet_session);
+        }else {
+          loseCoinFlip(result.toUpperCase(), bet_session);
+        }
+      }, 700)
+    }, 4000);
+  })
+
+}
+
+function winCoinFlip(result, session)
+{
+  const prize_log_text = session.label + ' session';
+  const coinflip_win_or_lose_div = document.querySelector('.coinflip-win-or-lose-div')
+  coinflip_win_or_lose_div.style.display = 'block';
+  coinflip_win_or_lose_div.innerHTML = `
+    <h3 class="text-success mb-2" style="margin-bottom: 5px">Result: ${result}<h3>
+    <h3 class="text-success">Congratulations, you won ${session.label} session!</h3>
+    <br>
+    <div class="text-center" style="margin-top: 10px;">
+      <button class="btn btn-primary mr-2" onclick="gotToCollect()">Collect</button>
+      <button class="btn btn-success" onclick="closeCoinFlipPopUp()">Play</button>
+    </div>
+  `
+  httpPost(addBonusUrl, {
+    bonus_minutes: Math.floor(session.time_seconds/60),
+    bonus_mb: session.data_mb, 
+    prize_log_text, 
+    game: 'coin_flip_game'}, function (data) {
+      if (data.error) {
+        alert(data.error)
+      }
+    })
+}
+function loseCoinFlip(result, session)
+{
+  const coinflip_win_or_lose_div = document.querySelector('.coinflip-win-or-lose-div')
+  coinflip_win_or_lose_div.style.display = 'block';
+  coinflip_win_or_lose_div.innerHTML = `
+    <h3 class="text-danger"  style="margin-bottom: 5px">Result: ${result}<h3>
+    <h3 class="text-danger">You lose the ${session.label} session</h3>
+    <div class="text-center" style="margin-top: 10px">
+      <button class="btn btn-success" onclick="closeCoinFlipPopUp()">Play</button>
+    </div>
+  `
+
+  httpPost(removeSessionUrl, {id : session.id }, function(data){
+    if (data.error) {
+      alert(data.error)
+    }
+  })
+}
+
+function closeCoinFlipPopUp()
+{
+  document.querySelector('.coin-flip-game-main-containers').style = "pointer-events: ''; opacity: 1";
+  document.querySelector('.coinflip-win-or-lose-div').style.display = 'none';
+  initCoinFlip();
 }
 
 (function () {

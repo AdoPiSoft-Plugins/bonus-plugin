@@ -1,0 +1,36 @@
+<div class="padd-top">
+  <div class="checkbox">
+    <label class="custom-checkbox control-label">
+      <input type="checkbox" name="enable-game" type="enable-game" ng-model="$ctrl.config.enable" ng-change="$ctrl.save()">
+      <span>Enable</span>
+    </label>
+  </div>
+  <div ng-if="$ctrl.config.enable">
+    <label class="control-label">COIN</label>
+    <div class="panel panel-primary">
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="control-label">Head</label>
+          <div class="flex">
+            <img ng-src="/plugins/bonus-plugin/assets/images/heads/{{$ctrl.head_icon}}" style="width: 100px; padding: 5px; margin-right: 5px;" alt="Head Image">
+            <div id="upload-head-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'head')" name="file" ngf-accept="'image/png'">
+              <span>Upload</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-info" ng-click="$ctrl.restoreIcon('head')" >Restore</button>
+          </div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label class="control-label">Tail</label>
+          <div class="flex">
+            <img ng-src="/plugins/bonus-plugin/assets/images/tails/{{$ctrl.tail_icon}}" style="width: 100px; padding: 5px; margin-right: 5px;" alt="Tail Image">
+            <div id="upload-tail-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'tail')" name="file" ngf-accept="'image/png'">
+              <span>Upload</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-info" ng-click="$ctrl.restoreIcon('tail')" >Restore</button>
+          </div>      
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

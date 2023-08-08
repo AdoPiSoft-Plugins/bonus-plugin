@@ -1,10 +1,12 @@
 const path = require('path')
 const fs = require('fs')
 const fsExtra = require('fs-extra')
+const randomstring = require('randomstring')
 
 const cfg_path = path.join(__dirname, 'config', 'bonus_plugin.json')
 const sounds_dir = '/assets/sounds'
 const sounds_dir_path = path.join(__dirname)
+const image_dir_path = path.join(__dirname, '/assets/images/');
 
 exports.read = async () => {
 
@@ -57,5 +59,44 @@ exports.getSounds = async () => {
     loser_sound: loser_sound[0]
   }
 }
+
+exports.imageFilename = async (type) => {
+  const files = await fsExtra.readdir(image_dir_path + type + 's/')
+  const default_icon = type + '.png'
+
+  if(files.length > 1){
+    return files.filter(f => f !== default_icon)[0]
+  }else {
+    return default_icon
+  }
+}
+
+exports.saveIcon = async(file, type) => {
+  const curr_icon = await exports.imageFilename(type)
+  const default_icon = type + '.png'
+
+  if(file.name === default_icon){
+    var ext = path.extname(file.name)
+    var rand_str = randomstring.generate({length: 8})
+    file.name = `${path.basename(file.name).replace(ext, '')}-${rand_str}${ext}`
+  }
+
+  if(curr_icon !== default_icon){
+    await fsExtra.remove(path.join(image_dir_path + type + 's/', curr_icon))
+  }
+
+  await file.mv(path.join(image_dir_path + type + 's/', file.name))
+  return file.name
+}
+exports.restoreIcon = async (type) => {
+  const files = await fsExtra.readdir(image_dir_path + type + 's/')
+  const default_icon = type + '.png'
+
+  const fn = files.filter(f => f !== default_icon)[0]
+  if(fn) await fsExtra.remove(path.join(image_dir_path + type + 's/', fn))
+
+  return default_icon
+}
+
 
 exports.id = null

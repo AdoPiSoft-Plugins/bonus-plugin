@@ -11,7 +11,7 @@
     var $ctrl = this
 
     function load () {
-      $http.get('/bonus-plugin-settings').then(res => {
+      $http.get('/bonus-plugin/settings').then(res => {
         $ctrl.settings = res.data
         $ctrl.certain_cfg = $ctrl.settings.certain_amount || {}
         $ctrl.optionIsRequired = !$ctrl.certain_cfg.bonus_limit_days

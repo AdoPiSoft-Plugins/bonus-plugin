@@ -13,7 +13,7 @@
 
       function getConfig () {
         $ctrl.colors = ['Silver', 'Gray', 'Black', 'Red', 'Maroon', 'Olive', 'Lime', 'Green', 'Teal', 'Blue', 'Navy', 'Fuchsia', 'Purple', 'Gold', 'Orange', 'Brown', 'Dark Orange', 'Pink', 'Cyan', 'Aquamarine', 'Bisque', 'Coral', 'Deep Pink', 'Light Salmon']
-        $http.get('/bonus-plugin-settings').then(d => {
+        $http.get('/bonus-plugin/settings').then(d => {
           $ctrl.settings = d.data
           const roleta_game =  $ctrl.settings.roleta_game || {}
           roleta_game.prizes = roleta_game.prizes || []
@@ -79,7 +79,7 @@
         roleta.prizes = prizes
         settings.roleta_game = roleta
         
-        $http.post('/bonus-plugin-settings', settings).then(() => {
+        $http.post('/bonus-plugin/settings', settings).then(() => {
           toastr.success('Successfully deleted')
           getConfig()
         }).catch(CatchHttpError)
@@ -93,7 +93,7 @@
 
       $ctrl.uploadIcon = (file, dir) => {
         return Upload.upload({
-          url: '/bonus-plugin-settings/roleta-game/sounds',
+          url: '/bonus-plugin/settings/roleta-game/sounds',
           data: {
             file,
             dir
@@ -105,7 +105,7 @@
       }
 
       $ctrl.deleteSound = (dir, file_name) => {
-        $http.post('/bonus-plugin-settings/roleta-game/sounds/delete', {dir, file_name}).then(() => {
+        $http.post('/bonus-plugin/settings/roleta-game/sounds/delete', {dir, file_name}).then(() => {
           toastr.success('Sound delete successfully')
           getConfig()
         }).catch(CatchHttpError)
@@ -122,7 +122,7 @@
               btnClass: 'btn-danger',
               keys: ['enter'],
               action: function () {
-                $http.post('/bonus-plugin-settings/roleta-game/reset-spin').then(() => {
+                $http.post('/bonus-plugin/settings/roleta-game/reset-spin').then(() => {
                   toastr.success('Successfully reset users spin')
                   getConfig()
                 })

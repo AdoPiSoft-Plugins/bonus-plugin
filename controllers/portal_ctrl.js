@@ -1,6 +1,8 @@
 const bonus_sessions = require('../services/bonus_sessions.js')
 const config = require('../config.js')
 const roleta_game = require('../services/roleta_game.js')
+const core = require('../../core')
+const { sessions_manager, devices_manager } = core
 
 exports.init = async (req, res, next) => {
   try {
@@ -63,6 +65,50 @@ exports.addBonus = async (req, res, next) => {
     await bonus_sessions.addBonus(params, device, customer)
     res.json({success: true})
   } catch (e) {
+    console.log(e)
+    next(e)
+  }
+}
+
+exports.getAvailableSessions = async (req, res, next) => {
+  try {
+    const { customer } = req
+    let sessions = customer
+      ? await sessions_manager.getCustomerSessions(customer.id)
+      : await sessions_manager.getDeviceSessions(req.device)
+
+    sessions = sessions.filter(s => {
+      if(s.status == 'available'){
+        s = s.toJSON()
+        return s
+      }
+    });
+
+    let cfg = await config.read();
+    cfg.coin_flip.head_icon = await config.imageFilename('head')
+    cfg.coin_flip.tail_icon = await config.imageFilename('tail')
+
+    res.json({sessions, config: cfg});
+  } catch (e)
+  {
+    console.log(e)
+    next(e)
+  }
+}
+
+exports.removeSession = async (req, res, next) => {
+  try {
+    var { id } = req.body
+    id = parseInt(id)
+    const device_id = parseInt(req.device.db_instance.id);
+    const device = await devices_manager.loadDevice(device_id)
+    await sessions_manager.removeDeviceFromSession(id, device)
+    if(!await sessions_manager.hasRunningSession(device)){
+      await device.disconnect()
+    }
+    res.json({ success: true})
+  } catch (e)
+  {
     console.log(e)
     next(e)
   }

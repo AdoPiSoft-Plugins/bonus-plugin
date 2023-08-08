@@ -79,3 +79,42 @@ exports.clearLogs = async (req, res, next) => {
     next(e)
   }
 }
+
+exports.uploadIcon = async (req, res, next) => {
+  try {
+    if(!req.files) return 'File is Empty'
+    const { file } = req.files
+    const { type } = req.body
+    const filename = await config.saveIcon(file, type)
+    res.json({ filename })
+
+  } catch (e) {
+    console.log(e)
+    next(e)
+  }
+}
+
+exports.getCoinFlipConfigs = async (req, res, next) => {
+  try {
+    const configs = await config.read();
+    const head_icon = await config.imageFilename('head')
+    const tail_icon = await config.imageFilename('tail')
+
+    const coinflip_cfg = configs.coin_flip;
+    coinflip_cfg.head_icon = head_icon
+    coinflip_cfg.tail_icon = tail_icon
+    res.json(coinflip_cfg)
+  } catch (e){
+    next(e)
+  }
+}
+
+exports.restoreIcon = async (req, res, next) => {
+  try {
+    const { type } = req.body;
+    const filename = await config.restoreIcon(type);
+    res.json({ filename })
+  } catch (e) {
+    next(e)
+  }
+}

@@ -1,7 +1,7 @@
 angular.module('Plugins')
   .controller('BonusCtrl', function ($http, $scope, SettingsSavedToastr, CatchHttpError, $q) {
     $scope.reload = function() {
-      $http.get('/bonus-plugin-settings').then(res => {
+      $http.get('/bonus-plugin/settings').then(res => {
         $scope.settings = res.data
       }).catch(e => {
         CatchHttpError(e)
@@ -14,13 +14,14 @@ angular.module('Plugins')
 
     $scope.onSave = (new_settings, req_from) => {
       var d = $q.defer()
-      $http.get('/bonus-plugin-settings').then(res => {
+      $http.get('/bonus-plugin/settings').then(res => {
         const configs = res.data
         if (req_from === 'enable_bonus') configs.enable_bonus = new_settings
         else if (req_from === 'roleta_game') configs.roleta_game = new_settings
         else if (req_from === 'certain_amount') configs.certain_amount = new_settings
+        else if (req_from === 'coin_flip_game') configs.coin_flip = new_settings
 
-        $http.post('/bonus-plugin-settings', configs)
+        $http.post('/bonus-plugin/settings', configs)
         .then(SettingsSavedToastr)
         .catch(CatchHttpError)
         .finally(() => d.resolve(true))

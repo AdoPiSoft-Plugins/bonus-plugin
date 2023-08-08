@@ -120,11 +120,11 @@ exports.addBonus = async (params, device, customer) => {
       mobile_device_id: device.db_instance.id,
       bonus_mb,
       bonus_minutes,
-      type: 'roleta_game',
+      type: game,
       customer_id: customer.id
     })
   }
 
-  const text = `User(${customer.id ? customer.username : device.db_instance.mac_address}) won ${prize_log_text} in ${game}.`
+  const text = `User(${customer.id ? customer.username : device.db_instance.mac_address}) won ${prize_log_text} in ${game.replace(/[._]/g, ' ').toUpperCase()}.`
   await bonus_logger.create(device.db_instance.id, text)
 }

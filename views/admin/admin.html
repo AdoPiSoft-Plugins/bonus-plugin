@@ -8,7 +8,7 @@
             <label class="custom-checkbox control-label">
               <input type="checkbox" name="enable_bonus" ng-model="settings.enable_bonus">
               <strong>Enable Bonus</strong>
-              <span class="help-block">When enabled, customers can play game/s and win any prizes.</span>
+              <span class="help-block">When enabled, customers can play games and win any prizes.</span>
             </label>
           </div>
         </form>
@@ -23,11 +23,8 @@
                 <uib-tab heading="Roleta Game">
                   <roleta-game onsave="onSave(new_settings, req_from)"></roleta-game>
                 </uib-tab>
-                <uib-tab heading="New Game">
-                  <div class="padd-top">
-                    <br>
-                    <p>COMING SOON ...</p>
-                  </div>
+                <uib-tab heading="Coin Flip Game">
+                  <coinflip-game onsave="onSave(new_settings, req_from)"></coinflip-game>
                 </uib-tab>
               </uib-tabset>
             </div>

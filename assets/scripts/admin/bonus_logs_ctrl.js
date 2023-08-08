@@ -3,7 +3,7 @@ angular.module('adopisoft')
     controller: 'BonusLogsCtrl',
     templateUrl: '/plugins/bonus-plugin/views/admin/bonus_logs.html'
   }).controller('BonusLogsCtrl', function($scope, $http, CatchHttpError, toastr, $ngConfirm) {
-    const logs_url = '/bonus-plugin-settings/get-bonus-logs'
+    const logs_url = '/bonus-plugin/settings/get-bonus-logs'
     $scope.currentPage = 1
     $scope.perPage = 25
     $scope.totalItems = 0
@@ -34,7 +34,7 @@ angular.module('adopisoft')
             btnClass: 'btn-danger',
             keys: ['enter'],
             action: function () {
-              $http.delete('/bonus-plugin-settings/clear-bonus-logs')
+              $http.delete('/bonus-plugin/settings/clear-bonus-logs')
                 .then(() => {
                   toastr.success('Bonus logs successfully cleared')
                   $scope.loadLogs()
