@@ -85,8 +85,8 @@ exports.getAvailableSessions = async (req, res, next) => {
     });
 
     let cfg = await config.read();
-    cfg.coin_flip.head_icon = await config.imageFilename('head')
-    cfg.coin_flip.tail_icon = await config.imageFilename('tail')
+    cfg.flip_game.first_choice_icon = await config.imageFilename('first-choice')
+    cfg.flip_game.second_choice_icon = await config.imageFilename('second-choice')
 
     res.json({sessions, config: cfg});
   } catch (e)

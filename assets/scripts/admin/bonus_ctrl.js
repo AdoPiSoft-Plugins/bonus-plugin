@@ -19,7 +19,7 @@ angular.module('Plugins')
         if (req_from === 'enable_bonus') configs.enable_bonus = new_settings
         else if (req_from === 'roleta_game') configs.roleta_game = new_settings
         else if (req_from === 'certain_amount') configs.certain_amount = new_settings
-        else if (req_from === 'coin_flip_game') configs.coin_flip = new_settings
+        else if (req_from === 'flip_game') configs.flip_game = new_settings
 
         $http.post('/bonus-plugin/settings', configs)
         .then(SettingsSavedToastr)

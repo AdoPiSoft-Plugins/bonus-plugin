@@ -36,15 +36,15 @@ router.post('/bonus-plugin/portal/collect', ipv4, device_reg, current_customer,
 router.get('/bonus-plugin/portal/roleta-game/spin-left', ipv4, device_reg, current_customer, portal_ctrl.getSpinLeft)
 router.post('/bonus-plugin/portal/roleta-game/update', ipv4,  device_reg, current_customer, portal_ctrl.update)
 router.post('/bonus-plugin/portal/add-bonus', ipv4, device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.addBonus)
-router.get('/bonus-plugin/portal/coinflip/get-sessions', ipv4, device_reg, current_customer, portal_ctrl.getAvailableSessions)
-router.post('/bonus-plugin/portal/coinflip/remove-session', ipv4, device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.removeSession)
-router.get('/bonus-plugin/settings/coinflip-game/configs', admin_ctrl.getCoinFlipConfigs);
+router.get('/bonus-plugin/portal/flip-game/get-sessions', ipv4, device_reg, current_customer, portal_ctrl.getAvailableSessions)
+router.post('/bonus-plugin/portal/flip-game/remove-session', ipv4, device_reg, current_customer, express.urlencoded({extended: true}), bodyParser.json(), portal_ctrl.removeSession)
+router.get('/bonus-plugin/settings/flip-game/configs', admin_ctrl.getFlipGameConfigs);
 
 router.post('/bonus-plugin/settings/upload-icon', fileUpload({
   limits: { fileSize: 5 * 1024 * 1024 * 1024 },
   useTempFiles: true,
   tempFileDir: process.env.TMPDIR
 }), admin_ctrl.uploadIcon)
-router.post('/bonus-plugin/settings/coinflip-game/restore-icon', express.urlencoded({extended: true}), bodyParser.json(), admin_ctrl.restoreIcon);
+router.post('/bonus-plugin/settings/flip-game/restore-icon', express.urlencoded({extended: true}), bodyParser.json(), admin_ctrl.restoreIcon);
 
 module.exports = router

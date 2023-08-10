@@ -1,1 +1,1 @@
-{"coin_flip":{"enable":false},"roleta_game":null,"enable_bonus":false}
+{"flip_game":{"enable":true,"first_choice_text":"Head","second_choice_text":"Tail","min_mins_session":50,"min_mb_session":50},"roleta_game":null,"enable_bonus":true,"can_play":true}

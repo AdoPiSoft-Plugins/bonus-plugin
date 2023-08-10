@@ -94,16 +94,16 @@ exports.uploadIcon = async (req, res, next) => {
   }
 }
 
-exports.getCoinFlipConfigs = async (req, res, next) => {
+exports.getFlipGameConfigs = async (req, res, next) => {
   try {
     const configs = await config.read();
-    const head_icon = await config.imageFilename('head')
-    const tail_icon = await config.imageFilename('tail')
+    const first_choice_icon = await config.imageFilename('first-choice')
+    const second_choice_icon = await config.imageFilename('second-choice')
 
-    const coinflip_cfg = configs.coin_flip;
-    coinflip_cfg.head_icon = head_icon
-    coinflip_cfg.tail_icon = tail_icon
-    res.json(coinflip_cfg)
+    const flip_game_cfg = configs.flip_game;
+    flip_game_cfg.first_choice_icon = first_choice_icon
+    flip_game_cfg.second_choice_icon = second_choice_icon
+    res.json(flip_game_cfg)
   } catch (e){
     next(e)
   }

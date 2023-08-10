@@ -1,0 +1,66 @@
+<div class="padd-top">
+  <div class="checkbox">
+    <label class="custom-checkbox control-label">
+      <input type="checkbox" name="enable-game" type="enable-game" ng-model="$ctrl.config.enable" ng-change="$ctrl.save()">
+      <span>Enable</span>
+    </label>
+  </div>
+  <div ng-if="$ctrl.config.enable">
+    <hr>
+    <form name="flipForm" ng-submit="$ctrl.save()">
+      <div class="form-group">
+        <label class="control-label">1st Choice</label>
+        <div class="flex">
+          <img ng-src="/plugins/bonus-plugin/assets/images/first-choice/{{$ctrl.first_choice_icon}}" style="width: 100px; padding: 5px; margin-right: 5px;" alt="First Choice Image">
+          <div id="upload-first-choice-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'first-choice')" name="first_choice_img">
+            <span>Upload</span>
+          </div>
+          <button type="button" class="btn btn-sm btn-info" ng-click="$ctrl.restoreIcon('first-choice')">Restore</button>
+        </div>
+        <div class="form-group padd-top" ng-class="{'has-error': flipForm.first_choice_text.$invalid}">
+          <label class="control-label">Text:</label>
+          <input type="text" name="first_choice_text" ng-model="$ctrl.config.first_choice_text" class="form-control" required>
+          <span class="help-block" ng-if="flipForm.first_choice_text.$error.required">It is required</span>
+        </div>
+      </div>
+      <hr>
+      <div class="form-group">
+        <label class="control-label">2nd Choice</label>
+        <div class="flex">
+          <img ng-src="/plugins/bonus-plugin/assets/images/second-choice/{{$ctrl.second_choice_icon}}" style="width: 100px; padding: 5px; margin-right: 5px;" alt="Second Choice Image">
+          <div id="upload-second-choice-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'second-choice')" name="second_choice_img">
+            <span>Upload</span>
+          </div>
+          <button type="button" class="btn btn-sm btn-info" ng-click="$ctrl.restoreIcon('second-choice')" >Restore</button>
+        </div> 
+        <div class="form-group padd-top" ng-class="{'has-error': flipForm.second_choice_text.$invalid}">
+          <label class="control-label">Text:</label>
+          <input type="text" name="second_choice_text" ng-model="$ctrl.config.second_choice_text" class="form-control" required>
+          <span class="help-block" ng-if="flipForm.second_choice_text.$error.required">It is required</span>
+        </div>     
+      </div>
+      <hr>
+      <div class="form-group padd-top" ng-class="{'has-error': flipForm.minimum_min_session.$invalid}">
+        <label class="control-label">Minimum Session(Minutes):</label>
+        <span class="help-block">User's minimum bet session in minutes</span>
+        <input type="number" name="minimum_min_session" ng-model="$ctrl.config.min_mins_session" class="form-control" min="1" required>
+        <span class="help-block" ng-if="flipForm.minimum_min_session.$error.required">It is required</span>
+        <span class="help-block" ng-if="flipForm.minimum_min_session.$error.min">
+          Minimum is 1
+        </span>
+      </div>
+      <hr>
+      <div class="form-group padd-bottom" ng-class="{'has-error': flipForm.minimum_mb_session.$invalid}">
+        <label class="control-label">Minimum Session (MB):</label>
+        <span class="help-block">User's minimum bet session in MB</span>
+        <input type="number" name="minimum_mb_session" ng-model="$ctrl.config.min_mb_session" class="form-control" min="1" required>
+        <span class="help-block" ng-if="flipForm.minimum_mb_session.$error.required">It is required</span>
+        <span class="help-block" ng-if="flipForm.minimum_mb_session.$error.min">
+          Minimum is 1
+        </span>
+      </div>
+
+      <button class="btn btn-sm btn-primary" type="submit" >Save</button>
+    </form>
+  </div>
+</div>

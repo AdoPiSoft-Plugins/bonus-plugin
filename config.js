@@ -61,7 +61,7 @@ exports.getSounds = async () => {
 }
 
 exports.imageFilename = async (type) => {
-  const files = await fsExtra.readdir(image_dir_path + type + 's/')
+  const files = await fsExtra.readdir(image_dir_path + type)
   const default_icon = type + '.png'
 
   if(files.length > 1){
@@ -82,18 +82,18 @@ exports.saveIcon = async(file, type) => {
   }
 
   if(curr_icon !== default_icon){
-    await fsExtra.remove(path.join(image_dir_path + type + 's/', curr_icon))
+    await fsExtra.remove(path.join(image_dir_path + type, curr_icon))
   }
 
-  await file.mv(path.join(image_dir_path + type + 's/', file.name))
+  await file.mv(path.join(image_dir_path + type, file.name))
   return file.name
 }
 exports.restoreIcon = async (type) => {
-  const files = await fsExtra.readdir(image_dir_path + type + 's/')
+  const files = await fsExtra.readdir(image_dir_path + type)
   const default_icon = type + '.png'
 
   const fn = files.filter(f => f !== default_icon)[0]
-  if(fn) await fsExtra.remove(path.join(image_dir_path + type + 's/', fn))
+  if(fn) await fsExtra.remove(path.join(image_dir_path + type, fn))
 
   return default_icon
 }
