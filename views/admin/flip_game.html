@@ -12,7 +12,7 @@
         <label class="control-label">1st Choice</label>
         <div class="flex">
           <img ng-src="/plugins/bonus-plugin/assets/images/first-choice/{{$ctrl.first_choice_icon}}" style="width: 100px; padding: 5px; margin-right: 5px;" alt="First Choice Image">
-          <div id="upload-first-choice-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'first-choice')" name="first_choice_img">
+          <div id="upload-first-choice-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'first-choice')" ngf-accept="$ctrl.accept" name="first_choice_img">
             <span>Upload</span>
           </div>
           <button type="button" class="btn btn-sm btn-info" ng-click="$ctrl.restoreIcon('first-choice')">Restore</button>
@@ -28,7 +28,7 @@
         <label class="control-label">2nd Choice</label>
         <div class="flex">
           <img ng-src="/plugins/bonus-plugin/assets/images/second-choice/{{$ctrl.second_choice_icon}}" style="width: 100px; padding: 5px; margin-right: 5px;" alt="Second Choice Image">
-          <div id="upload-second-choice-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'second-choice')" name="second_choice_img">
+          <div id="upload-second-choice-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'second-choice')" ngf-accept="$ctrl.accept" name="second_choice_img">
             <span>Upload</span>
           </div>
           <button type="button" class="btn btn-sm btn-info" ng-click="$ctrl.restoreIcon('second-choice')" >Restore</button>
@@ -58,6 +58,12 @@
         <span class="help-block" ng-if="flipForm.minimum_mb_session.$error.min">
           Minimum is 1
         </span>
+      </div>
+      <div class="form-group padd-bottom" ng-class="{'has-error': flipForm.chance_of_winning.$invalid}">
+        <label class="control-label">User's chance of winning</label>
+        <select class="form-control" name="chance_of_winning" ng-model="$ctrl.config.chance_of_winning" ng-options="cw for cw in $ctrl.chance_of_winnings" required></select>
+        <span class="help-block" ng-if="flipForm.chance_of_winning.$error.required">It is required</span>
+
       </div>
 
       <button class="btn btn-sm btn-primary" type="submit" >Save</button>

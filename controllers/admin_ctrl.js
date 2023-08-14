@@ -94,7 +94,7 @@ exports.uploadIcon = async (req, res, next) => {
   }
 }
 
-exports.getFlipGameConfigs = async (req, res, next) => {
+exports.getFlipGameConfig = async (req, res, next) => {
   try {
     const configs = await config.read();
     const first_choice_icon = await config.imageFilename('first-choice')

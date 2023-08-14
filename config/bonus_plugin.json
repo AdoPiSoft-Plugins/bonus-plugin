@@ -1,1 +1,1 @@
-{"flip_game":{"enable":false,"first_choice_text":"Head","second_choice_text":"Tail","min_mins_session":5,"min_mb_session":5},"roleta_game":null,"enable_bonus":false}
+{"flip_game":{"enable":false,"first_choice_text":"Head","second_choice_text":"Tail","min_mins_session":5,"min_mb_session":5, "chance_of_winning": "30%"},"roleta_game":null,"enable_bonus":false}

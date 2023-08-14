@@ -597,6 +597,7 @@ function initFlipGame()
   document.querySelector('.flip-game-main-containers').style = "pointer-events: ''; opacity: 1";
   document.querySelector('.start-flip-btn').disabled = true;
   document.querySelector('.session-select').disabled = true;
+
   document.querySelector('.loading-flip-game').style.display = 'block'
   document.querySelector('.choices-image-container').style.animation = 'none';
 
@@ -701,7 +702,7 @@ function loadSessionData(first_choice_btn, second_choice_btn)
 }
 
 function chooseFlipClick(e){
-  const targetElement = event.target;
+  const targetElement = e.target;
   const is_first_choice = targetElement.classList.contains('first-choice-btn');
   const is_second_choice = targetElement.classList.contains('second-choice-btn');
   const session_select = document.querySelector('.session-select');
@@ -758,44 +759,68 @@ function startFlip()
       start_flip_btn.innerText = 'Flip'
       return;
     }
-    const choices_image_container = document.querySelector('.choices-image-container');
-    const first_choice_img = document.querySelector('.front-image');
-    const second_choice_img = document.querySelector('.back-image');
-    const winner_div = document.querySelector('.winner-div');
+    const chance_of_winning = parseFloat(config.flip_game.chance_of_winning || '30%')/100;
+    const random_number = Math.random();
+    let final_result;
+    let final_result_text;
 
-    const is_first_choice = Math.random() < 0.5;
-
-    let result;
-    // flip 5 seconds
-    let result_text = '';
-    if(is_first_choice){
-      setTimeout(() => {
-        choices_image_container.style.animation = 'spin-first-choice 5s linear forwards';
-      }, 100)
-      result = 'first_choice';
-      result_text = document.querySelector('.first-choice-btn').innerText;
-    }else {
-      setTimeout(() => {
-        choices_image_container.style.animation = 'spin-second-choice 5s linear forwards';
-      }, 100)
-      result = 'second_choice';
-      result_text = document.querySelector('.second-choice-btn').innerText;
+    if(flip_game_bet.choosen === 'first_choice'){
+      const is_true = random_number < chance_of_winning;
+      const { result, result_text } = flip_coin_animation(is_true, 'first_choice')
+      final_result = result
+      final_result_text = result_text
+    }else if(flip_game_bet.choosen === 'second_choice'){
+      const is_true = random_number > (1 - chance_of_winning);
+      const { result, result_text } = flip_coin_animation(is_true, 'second_choice')
+      final_result = result
+      final_result_text = result_text
     }
+    
 
     setTimeout( async () => {
       start_flip_btn.innerText = "Flip"
       flip_game_started = false;
       bet_session.label = flip_game_bet.session.label;
-      if(flip_game_bet.choosen === result){
-        winFlipGame(result_text.toUpperCase(), bet_session);
+      if(flip_game_bet.choosen === final_result){
+        winFlipGame(final_result_text, bet_session);
       }else {
-        loseFlipGame(result_text.toUpperCase(), bet_session);
+        loseFlipGame(final_result_text, bet_session);
       }
       
     }, 4900);
   })
 
 }
+
+function flip_coin_animation(is_true, from) {
+  let result;
+  let result_text;
+  const choices_image_container = document.querySelector('.choices-image-container');
+  
+  if(is_true){
+    const _class = from === 'first_choice' ? 'spin-first-choice' : 'spin-second-choice';
+    const btn_class = from === 'first_choice' ? '.first-choice-btn' : '.second-choice-btn';
+    setTimeout(() => {
+      choices_image_container.style.animation =  _class + ' 5s linear forwards';
+    }, 100)
+    result = from === 'first_choice' ? 'first_choice' : 'second_choice';
+    result_text = document.querySelector(`${btn_class}`).innerText;
+  }
+  else {
+    const _class = from === 'first_choice' ? 'spin-second-choice' : 'spin-first-choice';
+    const btn_class = from === 'first_choice' ? '.second-choice-btn' : '.first-choice-btn';
+
+    setTimeout(() => {
+      choices_image_container.style.animation = _class + ' 5s linear forwards';
+    }, 100)
+    result = from === 'first_choice' ? 'second_choice' : 'first_choice';
+    result_text = document.querySelector(`${btn_class}`).innerText;
+  }
+  return {
+    result,
+    result_text: result_text.toUpperCase()
+  }
+} 
 
 function winFlipGame(result, session)
 {
