@@ -635,7 +635,7 @@ function loadSessionData(first_choice_btn, second_choice_btn)
     first_choice_btn.innerText = config.flip_game.first_choice_text;
     second_choice_btn.innerText = config.flip_game.second_choice_text;
     document.querySelector('.flip-game-title').innerText = "Choose " + config.flip_game.first_choice_text + " or " + config.flip_game.second_choice_text;
-    document.querySelector('.minimum-bet').innerText = 'Minimum minutes: ' + config.flip_game.min_mins_session + " | Minimum MB: " + config.flip_game.min_mb_session;
+    document.querySelector('.minimum-bet').innerText = 'minimum minutes: ' + config.flip_game.min_mins_session + " | minimum MB: " + config.flip_game.min_mb_session;
 
     document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/first-choice/" + config.flip_game.first_choice_icon;
     document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/second-choice/" + config.flip_game.second_choice_icon;
@@ -766,17 +766,17 @@ function startFlip()
 
     if(flip_game_bet.choosen === 'first_choice'){
       const is_true = random_number < chance_of_winning;
-      const { result, result_text } = flip_coin_animation(is_true, 'first_choice')
+      const { result, result_text } = flip_game_animation(is_true, 'first_choice')
       final_result = result
       final_result_text = result_text
     }else if(flip_game_bet.choosen === 'second_choice'){
       const is_true = random_number > (1 - chance_of_winning);
-      const { result, result_text } = flip_coin_animation(is_true, 'second_choice')
+      const { result, result_text } = flip_game_animation(is_true, 'second_choice')
       final_result = result
       final_result_text = result_text
     }
     
-
+    // 4.9 seconds process
     setTimeout( async () => {
       start_flip_btn.innerText = "Flip"
       flip_game_started = false;
@@ -792,7 +792,7 @@ function startFlip()
 
 }
 
-function flip_coin_animation(is_true, from) {
+function flip_game_animation(is_true, from) {
   let result;
   let result_text;
   const choices_image_container = document.querySelector('.choices-image-container');
