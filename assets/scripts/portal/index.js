@@ -244,12 +244,6 @@ function setBonusGame (game_div) {
             imgSrc: '/plugins/bonus-plugin/assets/images/flip/' + config.flip_game.game_icon,
             funcButton: 'initFlipGame()'
           }
-          const ct1 = {
-            content: `You can bet your available session and have a chance to double it. Minimum of ${config.flip_game.min_mins_session} mins. or ${config.flip_game.min_mb_session} MB session.`,
-            title: 'Flip Game',
-            imgSrc: '/plugins/bonus-plugin/assets/images/flip/' + config.flip_game.game_icon,
-            funcButton: 'initFlipGame()'
-          }
           games.push(ct)
           games.push(ct1)
         }

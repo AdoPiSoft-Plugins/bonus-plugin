@@ -33,6 +33,8 @@ exports.read = async () => {
         convertedPrizes.push(JSON.parse(p))        
       })
       cfg.roleta_game.prizes = convertedPrizes
+    }else {
+      cfg.roleta_game.prizes = []
     }
   }
   if (!cfg.flip_game) {
