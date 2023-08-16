@@ -245,7 +245,6 @@ function setBonusGame (game_div) {
             funcButton: 'initFlipGame()'
           }
           games.push(ct)
-          games.push(ct1)
         }
       }
     }
