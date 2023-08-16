@@ -124,7 +124,6 @@ exports.addBonus = async (params, device, customer) => {
       customer_id: customer.id
     })
   }
-
   const text = `User(${customer.id ? customer.username : device.db_instance.mac_address}) won ${prize_log_text} in ${game.replace(/[._]/g, ' ').toUpperCase()}.`
   await bonus_logger.create(device.db_instance.id, text)
 }

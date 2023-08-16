@@ -5,6 +5,8 @@ const bonus_logger = require('../bonus_logger.js')
 exports.get = async (req, res, next) => {
   try {
     const cfg = await config.read()
+    cfg.roleta_game = cfg.roleta_game || {}
+    cfg.roleta_game.game_icon = await config.imageFilename(null, 'roleta_game')
     res.send(cfg)
   } catch (e) {
     next(e)
@@ -84,8 +86,8 @@ exports.uploadIcon = async (req, res, next) => {
   try {
     if(!req.files) return 'File is Empty'
     const { file } = req.files
-    const { type } = req.body
-    const filename = await config.saveIcon(file, type)
+    const { game, choice } = req.body
+    const filename = await config.saveIcon(file, choice, game)
     res.json({ filename })
 
   } catch (e) {
@@ -97,12 +99,14 @@ exports.uploadIcon = async (req, res, next) => {
 exports.getFlipGameConfig = async (req, res, next) => {
   try {
     const configs = await config.read();
-    const first_choice_icon = await config.imageFilename('first-choice')
-    const second_choice_icon = await config.imageFilename('second-choice')
+    const first_choice_icon = await config.imageFilename('first-choice', 'flip_game')
+    const second_choice_icon = await config.imageFilename('second-choice', 'flip_game')
+    const game_icon = await config.imageFilename(null, 'flip_game')
+    const flip_game_cfg = configs.flip_game || {};
 
-    const flip_game_cfg = configs.flip_game;
     flip_game_cfg.first_choice_icon = first_choice_icon
     flip_game_cfg.second_choice_icon = second_choice_icon
+    flip_game_cfg.game_icon = game_icon
     res.json(flip_game_cfg)
   } catch (e){
     next(e)
@@ -111,8 +115,8 @@ exports.getFlipGameConfig = async (req, res, next) => {
 
 exports.restoreIcon = async (req, res, next) => {
   try {
-    const { type } = req.body;
-    const filename = await config.restoreIcon(type);
+    const { game, choice } = req.body;
+    const filename = await config.restoreIcon(game,choice);
     res.json({ filename })
   } catch (e) {
     next(e)

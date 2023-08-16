@@ -1,5 +1,5 @@
 const router = require('./router.js')
-const { app, on_activation_ready, is_plugin_paid } = require('../core.js')
+const { app, on_activation_ready, is_plugin_paid, plugin_config} = require('../core.js')
 const models = require('./models')
 const config = require('./config.js')
 
@@ -12,10 +12,11 @@ module.exports = {
       try {
         if(await is_plugin_paid(plugin_name)) return
 
-        const cfg = await config.read();
-        cfg.enable_bonus = false
-        cfg.can_play = false
-        await config.save(cfg)
+        const cfg = {
+          enable_bonus: false,
+          can_play: false
+        }
+        await plugin_config.updatePlugin(id, cfg);
       } catch (e) {
         console.log(e)
       }

@@ -10,6 +10,10 @@ exports.init = async (req, res, next) => {
 
     customer = customer || {id: null}
     const bonus = await bonus_sessions.load(device, customer)
+    const cfg = bonus.config || {}
+    cfg.roleta_game.game_icon = await config.imageFilename(null, 'roleta_game')
+    cfg.flip_game.game_icon = await config.imageFilename(null, 'flip_game')
+    bonus.config = cfg
     res.json(bonus)
   } catch (e) {
     next(e)
@@ -85,8 +89,9 @@ exports.getAvailableSessions = async (req, res, next) => {
     });
 
     let cfg = await config.read();
-    cfg.flip_game.first_choice_icon = await config.imageFilename('first-choice')
-    cfg.flip_game.second_choice_icon = await config.imageFilename('second-choice')
+    cfg.flip_game.first_choice_icon = await config.imageFilename('first-choice', 'flip_game')
+    cfg.flip_game.second_choice_icon = await config.imageFilename('second-choice', 'flip_game')
+    cfg.flip_game.game_icon = await config.imageFilename(null, 'flip_game')
 
     res.json({sessions, config: cfg});
   } catch (e)

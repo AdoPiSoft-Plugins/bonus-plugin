@@ -8,10 +8,22 @@
   <div ng-if="$ctrl.config.enable">
     <hr>
     <form name="flipForm" ng-submit="$ctrl.save()">
+      <div class="form-group padd-bottom">
+        <label class="control-label">Game Icon:</label>
+        <div class="flex">
+          <img ng-src="/plugins/bonus-plugin/assets/images/flip/{{$ctrl.game_icon}}" style="width: 100px; padding: 5px; margin-right: 5px; border-radius: 50%;" alt="Game Icon">
+          <div id="upload-game-icon" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file)" ngf-accept="$ctrl.accept" name="game_icon">
+            <span>Upload</span>
+          </div>
+          <button type="button" class="btn btn-sm btn-info" ng-click="$ctrl.restoreIcon()">Restore</button>
+        </div> 
+      </div>
+      <hr>
       <div class="form-group">
+        <h4>CHOICES</h4>
         <label class="control-label">1st Choice</label>
         <div class="flex">
-          <img ng-src="/plugins/bonus-plugin/assets/images/first-choice/{{$ctrl.first_choice_icon}}" style="width: 100px; padding: 5px; margin-right: 5px;" alt="First Choice Image">
+          <img ng-src="/plugins/bonus-plugin/assets/images/flip/first-choice/{{$ctrl.first_choice_icon}}" style="width: 100px; padding: 5px; margin-right: 5px; border-radius: 50%;" alt="First Choice Image">
           <div id="upload-first-choice-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'first-choice')" ngf-accept="$ctrl.accept" name="first_choice_img">
             <span>Upload</span>
           </div>
@@ -27,7 +39,7 @@
       <div class="form-group">
         <label class="control-label">2nd Choice</label>
         <div class="flex">
-          <img ng-src="/plugins/bonus-plugin/assets/images/second-choice/{{$ctrl.second_choice_icon}}" style="width: 100px; padding: 5px; margin-right: 5px;" alt="Second Choice Image">
+          <img ng-src="/plugins/bonus-plugin/assets/images/flip/second-choice/{{$ctrl.second_choice_icon}}" style="width: 100px; padding: 5px; margin-right: 5px; border-radius: 50%;" alt="Second Choice Image">
           <div id="upload-second-choice-image" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file, 'second-choice')" ngf-accept="$ctrl.accept" name="second_choice_img">
             <span>Upload</span>
           </div>

@@ -22,7 +22,6 @@
           $ctrl.sounds = $ctrl.roleta.sounds || {}
           $ctrl.optionIsRequired = !$ctrl.roleta.reset_spin_after
           $ctrl.prizes = $ctrl.roleta.prizes || []
-
           $ctrl.prizes.forEach(p => {
             $ctrl.colors.forEach(c => {
               if (c.toLowerCase().replace(/\s+/g, '') === p.color) {
@@ -32,6 +31,31 @@
           })
           $ctrl.new_prize.color = $ctrl.colors[0]
         })
+      }
+
+      $ctrl.saveFile = (file) => {
+        Upload.upload({
+          url: '/bonus-plugin/settings/upload-icon',
+          data: { 
+            file,
+            game: 'roleta_game'
+          }
+        })
+        .then((res) => {
+          $ctrl.roleta.game_icon = res.data.filename;
+          toastr.success('Icon saved successfully.');
+        })
+        .catch(CatchHttpError);
+      };
+  
+      $ctrl.restoreIcon = () => {
+        $http.post('/bonus-plugin/settings/restore-icon', { game: 'roleta_game' })
+          .then((res) => {
+            $ctrl.roleta.game_icon = res.data.filename;
+            toastr.success('Icon successfully restored.');
+          }).catch(e => {
+            CatchHttpError(e)
+          })
       }
 
       $ctrl.saveSettings = (call) => {

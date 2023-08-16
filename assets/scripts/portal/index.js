@@ -218,6 +218,8 @@ function collect (bonus, btn) {
 function setBonusGame (game_div) {
   let games = []
   var game_type = ['roleta_game', 'flip_game'] // add here the added game
+
+  game_div.style = 'display: flex; justify-content: space-around; flex-wrap: wrap;'
   game_div.innerHTML = ''
   var config = fetchedData.config
 
@@ -226,22 +228,50 @@ function setBonusGame (game_div) {
       if (config && config.hasOwnProperty(item)) {
 
         if (item === 'roleta_game' &&  config.roleta_game && config.roleta_game.prizes.length > 2 && config.roleta_game.max_spin) {
-          var ct = `<span><strong>Roleta Game</strong>, you can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes. Play </span> <a onclick="initRoleta()">here.</a>`
-          games.push(ct)
+          const ct = {
+            content: `You can spin ${config.roleta_game.max_spin}x within ${config.roleta_game.reset_spin_after.replace('_', ' ')} and win prizes.`,
+            title: 'Roleta Game',
+            imgSrc: '/plugins/bonus-plugin/assets/images/roleta/' + config.roleta_game.game_icon,
+            funcButton: 'initRoleta()'
+          }
+          games.push(ct) 
+
         }
         if(item === 'flip_game' && config.flip_game && config.flip_game.enable){
-          var ct = `<span><strong>Flip Game</strong>, you can bet your available session and have a chance to double it. Play </span> <a onclick="initFlipGame()">here.</a>`
+          const ct = {
+            content: `You can bet your available session and have a chance to double it. Minimum of ${config.flip_game.min_mins_session} mins. or ${config.flip_game.min_mb_session} MB session.`,
+            title: 'Flip Game',
+            imgSrc: '/plugins/bonus-plugin/assets/images/flip/' + config.flip_game.game_icon,
+            funcButton: 'initFlipGame()'
+          }
+          const ct1 = {
+            content: `You can bet your available session and have a chance to double it. Minimum of ${config.flip_game.min_mins_session} mins. or ${config.flip_game.min_mb_session} MB session.`,
+            title: 'Flip Game',
+            imgSrc: '/plugins/bonus-plugin/assets/images/flip/' + config.flip_game.game_icon,
+            funcButton: 'initFlipGame()'
+          }
           games.push(ct)
+          games.push(ct1)
         }
       }
     }
     if (games.length > 0) {
       for (var item of games) {
         var index = games.indexOf(item) + 1
-        var p = document.createElement('p')
-        p.className = 'p_element'
-        p.innerHTML = index + '. ' + item
-        game_div.append(p)
+        const game_container = document.createElement('div')
+        game_container.className = "game-container"
+        game_container.id = index + '-game'
+        game_container.innerHTML = `
+        <div class="game-container-content">
+          <div class="img-container">
+            <img src="${item.imgSrc}">
+          </div>
+          <p id="title">${item.title}</p>
+          <small>${item.content}</small>
+          <button class="btn btn-success" onclick="${item.funcButton}">Play</button>
+        </div>
+        `
+        game_div.append(game_container)
       }
     } else {
       var p = document.createElement('p')
@@ -279,7 +309,6 @@ function tabClick (i) {
   } else if (i === 2) {
     rewards_div.style.display = 'none'
     refresh_btn.style.display = 'none'
-    game_div.style.display = 'block'
     game_a.style = 'font-weight: bold; border-bottom: 3px solid #920092;'
     rewards_a.style = 'font-weight: normal; border-bottom: none'
     setBonusGame(game_div)
@@ -637,8 +666,8 @@ function loadSessionData(first_choice_btn, second_choice_btn)
     document.querySelector('.flip-game-title').innerText = "Choose " + config.flip_game.first_choice_text + " or " + config.flip_game.second_choice_text;
     document.querySelector('.minimum-bet').innerText = 'minimum minutes: ' + config.flip_game.min_mins_session + " | minimum MB: " + config.flip_game.min_mb_session;
 
-    document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/first-choice/" + config.flip_game.first_choice_icon;
-    document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/second-choice/" + config.flip_game.second_choice_icon;
+    document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/flip/first-choice/" + config.flip_game.first_choice_icon;
+    document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/flip/second-choice/" + config.flip_game.second_choice_icon;
     document.querySelector('.flip-game-main').style.display = 'block'
     document.querySelector('.loading-flip-game').style.display = 'none'
     const session_select = document.querySelector('.session-select')
@@ -745,8 +774,8 @@ function startFlip()
     data = JSON.parse(data)
     const sessions = data.sessions;
     const config = data.config;
-    document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/first-choice/" + config.flip_game.first_choice_icon;
-    document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/second-choice/" + config.flip_game.second_choice_icon;
+    document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/flip/first-choice/" + config.flip_game.first_choice_icon;
+    document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/flip/second-choice/" + config.flip_game.second_choice_icon;
     
     const bet_session = (sessions.filter(s => s.id == flip_game_bet.session.value) || {})[0];
     if(!bet_session || bet_session.status !== 'available'){
@@ -824,7 +853,7 @@ function flip_game_animation(is_true, from) {
 
 function winFlipGame(result, session)
 {
-  const prize_log_text = session.label + ' session';
+  const prize_log_text = session.label
   const flip_game_win_or_lose_div = document.querySelector('.flip-game-win-or-lose-div')
   
   httpPost(addBonusUrl, {

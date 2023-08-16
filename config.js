@@ -1,17 +1,17 @@
 const path = require('path')
-const fs = require('fs')
 const fsExtra = require('fs-extra')
 const randomstring = require('randomstring')
 
-const cfg_path = path.join(__dirname, 'config', 'bonus_plugin.json')
 const sounds_dir = '/assets/sounds'
 const sounds_dir_path = path.join(__dirname)
-const image_dir_path = path.join(__dirname, '/assets/images/');
+const img_dir_path = path.join(__dirname, '/assets/images/');
+
+const core = require('../core.js')
+const { plugin_config } = core
 
 exports.read = async () => {
-
-  let cfg = (await fs.promises.readFile(cfg_path, "utf8")) || {};
-  cfg = JSON.parse(cfg)
+  const { plugins } = await plugin_config.read()
+  let cfg = plugins.find(p => p.id === exports.id) || {}
 
   if (cfg.certain_amount) {
     cfg.certain_amount.bonus_amount_needed = parseInt(cfg.certain_amount.bonus_amount_needed)
@@ -19,8 +19,34 @@ exports.read = async () => {
 
   cfg.roleta_game = cfg.roleta_game || null
 
+  if (!cfg.hasOwnProperty('enable_bonus')){
+    cfg.enable_bonus = false
+  }
+
   if (cfg.roleta_game) {
     cfg.roleta_game.sounds = await exports.getSounds()
+    cfg.roleta_game.max_spin = parseInt(cfg.roleta_game.max_spin)
+    cfg.roleta_game.bonus_minutes = parseInt(cfg.roleta_game.bonus_minutes)
+    if (cfg.roleta_game.prizes) {
+      const convertedPrizes = []
+      cfg.roleta_game.prizes.forEach((p) => {
+        convertedPrizes.push(JSON.parse(p))        
+      })
+      cfg.roleta_game.prizes = convertedPrizes
+    }
+  }
+  if (!cfg.flip_game) {
+    // default config
+    cfg.flip_game = {
+      first_choice_text: 'Head',
+      second_choice_text: 'Tail',
+      chance_of_winning: '30%',
+      min_mins_session: 5,
+      min_mb_session: 5
+    }
+  }else {
+    cfg.flip_game.min_mb_session = parseInt(cfg.flip_game.min_mb_session)
+    cfg.flip_game.min_mins_session = parseInt(cfg.flip_game.min_mins_session)
   }
 
   return cfg
@@ -28,7 +54,7 @@ exports.read = async () => {
 
 exports.save = async (cfg) => {
   if (!cfg) return
-  return await fs.promises.writeFile(cfg_path, JSON.stringify(cfg))
+  await plugin_config.updatePlugin(exports.id, cfg)
 }
 
 exports.deleteSound = async (dir, fname) => {
@@ -60,20 +86,42 @@ exports.getSounds = async () => {
   }
 }
 
-exports.imageFilename = async (type) => {
-  const files = await fsExtra.readdir(image_dir_path + type)
-  const default_icon = type + '.png'
+exports.imageFilename = async (choice, game) => {
+  const dir = game === 'flip_game' ? 'flip/' : 'roleta/';
+  var default_icon;
+  var asset_path;
 
+  if (choice){
+    default_icon = choice + '.png'
+    asset_path = img_dir_path + dir + choice
+    
+  }else {
+    // Main Game Icon
+    default_icon = game + '_default.png'
+    asset_path = img_dir_path + dir
+  }
+  const files = await exports.getFiles(asset_path)
   if(files.length > 1){
     return files.filter(f => f !== default_icon)[0]
   }else {
     return default_icon
   }
 }
+exports.saveIcon = async(file, choice, game) => {
+  const curr_icon = await exports.imageFilename(choice, game)
+  const dir = game === 'flip_game' ? 'flip/' : 'roleta/';
 
-exports.saveIcon = async(file, type) => {
-  const curr_icon = await exports.imageFilename(type)
-  const default_icon = type + '.png'
+  var default_icon;
+  var assetPath;
+  
+  if(choice){
+    default_icon = choice + '.png'
+    assetPath = img_dir_path + dir + choice
+  } else {
+    // Main Game Icon
+    default_icon = game + '_default.png'
+    assetPath = img_dir_path + dir
+  }
 
   if(file.name === default_icon){
     var ext = path.extname(file.name)
@@ -82,21 +130,45 @@ exports.saveIcon = async(file, type) => {
   }
 
   if(curr_icon !== default_icon){
-    await fsExtra.remove(path.join(image_dir_path + type, curr_icon))
+    await fsExtra.remove(path.join(assetPath, curr_icon))
   }
 
-  await file.mv(path.join(image_dir_path + type, file.name))
+  await file.mv(path.join(assetPath, file.name))
   return file.name
 }
-exports.restoreIcon = async (type) => {
-  const files = await fsExtra.readdir(image_dir_path + type)
-  const default_icon = type + '.png'
+exports.restoreIcon = async (game, choice) => {
+  const dir = game === 'flip_game' ? 'flip/' : 'roleta/';
+  var default_icon;
+  var asset_path;
+  
+  if (choice) {
+    default_icon = choice + '.png'
+    asset_path = img_dir_path + dir + choice
+  } else {
+    // Main Game Icon
+    default_icon = game + '_default.png'
+    asset_path = img_dir_path + dir
+  }
 
+  const files = await exports.getFiles(asset_path)
   const fn = files.filter(f => f !== default_icon)[0]
-  if(fn) await fsExtra.remove(path.join(image_dir_path + type, fn))
+  if(fn) await fsExtra.remove(path.join(asset_path, fn))
 
   return default_icon
 }
 
+exports.getFiles = async (asset_path) => {
+  const items = await fsExtra.readdir(asset_path)
+  const filePromises = items.map(async item => {
+    const itemPath = `${asset_path}/${item}`
+    const stat = await fsExtra.stat(itemPath) 
+    if(stat.isFile()) {
+      return item;
+    }
+    return null
+  })
+
+  return (await Promise.all(filePromises)).filter(file => file !== null)
+}
 
 exports.id = null

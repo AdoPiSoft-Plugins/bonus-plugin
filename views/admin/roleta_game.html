@@ -61,8 +61,17 @@
       </div>
       <roleta-audio-btn file-name="$ctrl.sounds.loser_sound" dir="'lose'"></roleta-audio-btn>
       <button ng-disabled="!$ctrl.sounds.loser_sound" type="button" class="btn btn-danger btn-sm" ng-click="$ctrl.deleteSound('lose', $ctrl.sounds.loser_sound)"><i class="fa fa-trash"></i>Delete</button>
-
     </div>
+  </div>
+  <div class="form-group padd-bottom">
+    <label class="control-label">Game Icon:</label>
+    <div class="flex">
+      <img ng-src="/plugins/bonus-plugin/assets/images/roleta/{{$ctrl.roleta.game_icon}}" style="width: 100px; padding: 5px; margin-right: 5px; border-radius: 50%;" alt="Game Icon">
+      <div id="upload-game-icon" class="btn btn-sm btn-primary" ngf-select="$ctrl.saveFile($file)" ngf-accept="$ctrl.accept" name="game_icon">
+        <span>Upload</span>
+      </div>
+      <button type="button" class="btn btn-sm btn-info" ng-click="$ctrl.restoreIcon()">Restore</button>
+    </div> 
   </div>
 </div>
 <div>
