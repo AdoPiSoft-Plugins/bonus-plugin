@@ -64,16 +64,21 @@ exports.deleteSound = async (dir, fname) => {
 }
 
 exports.saveSound = async (file, dir) => {
-  const file_name = await exports.getFilename(dir)
-  if (file_name.length > 0) {
-    await fsExtra.remove(path.join(sounds_dir_path, sounds_dir, dir, file_name[0]))
+  const file_names = await exports.getFilenames(dir)
+  if (file_names.length > 0) {
+    await fsExtra.remove(path.join(sounds_dir_path, sounds_dir, dir, file_names[0]))
   }
   //save
   await file.mv(path.join(sounds_dir_path, sounds_dir, dir, file.name))
 }
 
-exports.getFilename = async (dir) => {
-  return await fsExtra.readdir(path.join(sounds_dir_path, sounds_dir, dir))
+exports.getFilenames = async (dir) => {
+  try {
+    return await fsExtra.readdir(path.join(sounds_dir_path, sounds_dir, dir))
+  } catch (e) {
+    console.log(e)
+    return []
+  }
 }
 
 exports.getSounds = async () => {
@@ -160,17 +165,22 @@ exports.restoreIcon = async (game, choice) => {
 }
 
 exports.getFiles = async (asset_path) => {
-  const items = await fsExtra.readdir(asset_path)
-  const filePromises = items.map(async item => {
-    const itemPath = `${asset_path}/${item}`
-    const stat = await fsExtra.stat(itemPath) 
-    if(stat.isFile()) {
-      return item;
-    }
-    return null
-  })
+  try {
+    const items = await fsExtra.readdir(asset_path)
+    const filePromises = items.map(async item => {
+      const itemPath = `${asset_path}/${item}`
+      const stat = await fsExtra.stat(itemPath)
+      if(stat.isFile()) {
+        return item;
+      }
+      return null
+    })
+    return (await Promise.all(filePromises)).filter(file => file !== null)
 
-  return (await Promise.all(filePromises)).filter(file => file !== null)
+  } catch (e) {
+    console.log(e)
+    return []
+  }
 }
 
 exports.id = null
