@@ -2,9 +2,13 @@ const path = require('path')
 const fsExtra = require('fs-extra')
 const randomstring = require('randomstring')
 
-const sounds_dir = '/assets/sounds'
-const sounds_dir_path = path.join(__dirname)
-const img_dir_path = path.join(__dirname, '/assets/images/');
+var sounds_dir_path = path.join('/opt/adopisoft/plugins/bonus-plugin/assets/sounds')
+var img_dir_path = path.join('/opt/adopisoft/plugins/bonus-plugin/assets/images/');
+
+// removeIf(prod)
+sounds_dir_path = path.join(__dirname, '/assets/sounds')
+img_dir_path = path.join(__dirname, '/assets/images/');
+// endRemoveIf(prod)
 
 const core = require('../core.js')
 const { plugin_config } = core
@@ -60,21 +64,21 @@ exports.save = async (cfg) => {
 }
 
 exports.deleteSound = async (dir, fname) => {
-  await fsExtra.remove(path.join(sounds_dir_path, sounds_dir, dir, fname))
+  await fsExtra.remove(path.join(sounds_dir_path, dir, fname))
 }
 
 exports.saveSound = async (file, dir) => {
   const file_names = await exports.getFilenames(dir)
   if (file_names.length > 0) {
-    await fsExtra.remove(path.join(sounds_dir_path, sounds_dir, dir, file_names[0]))
+    await fsExtra.remove(path.join(sounds_dir_path, dir, file_names[0]))
   }
   //save
-  await file.mv(path.join(sounds_dir_path, sounds_dir, dir, file.name))
+  await file.mv(path.join(sounds_dir_path, dir, file.name))
 }
 
 exports.getFilenames = async (dir) => {
   try {
-    return await fsExtra.readdir(path.join(sounds_dir_path, sounds_dir, dir))
+    return await fsExtra.readdir(path.join(sounds_dir_path, dir))
   } catch (e) {
     console.log(e)
     return []
@@ -82,14 +86,23 @@ exports.getFilenames = async (dir) => {
 }
 
 exports.getSounds = async () => {
-  const spin_bg_sound = await fsExtra.readdir(path.join(sounds_dir_path, sounds_dir, 'spin'))
-  const winner_sound = await fsExtra.readdir(path.join(sounds_dir_path, sounds_dir, 'win'))
-  const loser_sound = await fsExtra.readdir(path.join(sounds_dir_path, sounds_dir, 'lose'))
-
-  return {
-    spin_bg_sound: spin_bg_sound[0],
-    winner_sound: winner_sound[0],
-    loser_sound: loser_sound[0]
+  try {
+    const spin_bg_sound = await fsExtra.readdir(path.join(sounds_dir_path, 'spin'))
+    const winner_sound = await fsExtra.readdir(path.join(sounds_dir_path, 'win'))
+    const loser_sound = await fsExtra.readdir(path.join(sounds_dir_path, 'lose'))
+  
+    return {
+      spin_bg_sound: spin_bg_sound[0],
+      winner_sound: winner_sound[0],
+      loser_sound: loser_sound[0]
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      spin_bg_sound: null,
+      winner_sound: null,
+      loser_sound: null
+    }
   }
 }
 

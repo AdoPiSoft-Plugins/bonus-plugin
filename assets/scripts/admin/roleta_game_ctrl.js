@@ -10,6 +10,7 @@
     }).controller('RoletaGameCtrl', function ($http, CatchHttpError, SettingsSavedToastr, toastr, Upload, $ngConfirm) {
       var $ctrl = this
       $ctrl.has_prize_options = ['Yes', 'No']
+      $ctrl.accept = ['.jpeg', '.jpg', '.png', '.ico'].join(',');
 
       function getConfig () {
         $ctrl.colors = ['Silver', 'Gray', 'Black', 'Red', 'Maroon', 'Olive', 'Lime', 'Green', 'Teal', 'Blue', 'Navy', 'Fuchsia', 'Purple', 'Gold', 'Orange', 'Brown', 'Dark Orange', 'Pink', 'Cyan', 'Aquamarine', 'Bisque', 'Coral', 'Deep Pink', 'Light Salmon']
