@@ -83,7 +83,7 @@
     margin-right: 5px;
     margin-bottom: 5px;
     width: 48%;
-    height: 270px;
+    height: 275px;
     border: 1px solid rgba(0,0,0,0.3);
     border-radius: 5px;
   }
@@ -295,21 +295,35 @@
     opacity: 0.3;
   }
   .flip-game .flip-game-main .bet-session-container{
-    margin-top: 20px;
-    display: flex;
+    margin-top: 5px;
+    display: block;
     align-items: center;
     width: 90%;
     margin: 20px auto 0px auto;
   }
-  .flip-game .flip-game-main .bet-session-container span{
-    font-size: 18px;
+  .flip-game .flip-game-main .bet-session-container .session-div{
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .flip-game .flip-game-main .bet-session-container .bet-amount-div{
+    display: block;
+    align-items: center;
+    margin-bottom: 5px;
   }
 
   .flip-game .flip-game-main .bet-session-container select{
     width: 100%;
     padding: 5px;
     margin-left: 10px;
-    padding: 10px;
+    border: 1px solid rgba(0,0,0,0.4);
+    outline: none;
+    border-radius: 5px;
+  }
+  .flip-game .flip-game-main .bet-session-container input {
+    width: 100%;
+    padding: 5px;
+    margin-left: 10px;
     border: 1px solid rgba(0,0,0,0.4);
     outline: none;
     border-radius: 5px;
@@ -453,7 +467,7 @@
       </div>
       <div class="flip-game-main">
         <div class="flip-game-win-or-lose-div text-center"></div>
-        <h4 class="text-primary flip-game-title " style="margin-bottom: 20px;"></h4>
+        <h4 class="text-primary flip-game-title " style="margin-bottom: 5px;"></h4>
         <div class="choices-image-container">
           <img src="" style="border-radius: 50%;" class="back-image" id="back-image" >
           <img src="" style="border-radius: 50%;" class="front-image" id="front-image" >
@@ -466,12 +480,19 @@
             </button>
           </div>
           <div class="bet-session-container" >
-            <span>Bet:</span>
-            <select class="session-select" disabled>
-            </select>
+            <div class="session-div">
+              <small>Session:</small>
+              <select class="session-select" disabled>
+              </select>
+            </div>
+            <div class="bet-amount-div">
+              <div style="display: flex; align-items: center;">
+                <small>Amount:</small>
+                <input type="number" placeholder="Bet amount" id="bet-amount" name="bet_amount">
+              </div>
+              <small id="minimum-available">Available: | Minimum</small>
+            </div>
           </div>
-          <p class="minimum-bet" style="text-align: left; margin-left: 60px; font-size: 12px; margin-top: 5px;">
-          </p>
           <button class="start-flip-btn" disabled onclick="startFlip()" style="margin-top: 5px;">Flip</button>
         </div>
       </div>

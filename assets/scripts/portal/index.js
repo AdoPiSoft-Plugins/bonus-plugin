@@ -142,6 +142,20 @@ function convertCredits (time) {
   return text
 }
 
+function convertCreditsShort(seconds){
+
+  let sec = formatTime(seconds)
+  var text = sec.seconds + 's';
+  if (sec.hours > 0 || sec.days > 0 || sec.minutes > 0)
+    text =  sec.minutes + 'm:' + text;
+  if (sec.days > 0 || sec.hours > 0)
+    text = sec.hours + 'h:' + text;
+  if (sec.days > 0)
+    text = sec.days + 'd:' + text;
+
+  return text
+}
+
 function formatTime (secs) {
   var days, hours, mins, seconds
   secs = secs > 0 ? secs : 0
@@ -239,7 +253,7 @@ function setBonusGame (game_div) {
         }
         if(item === 'flip_game' && config.flip_game && config.flip_game.enable){
           const ct = {
-            content: `You can bet your available session and have a chance to double it. Minimum of ${config.flip_game.min_mins_session} mins. or ${config.flip_game.min_mb_session} MB session.`,
+            content: `You can bet your available session (time and data only) and have a chance to double it. Minimum of ${config.flip_game.min_mins_session} minutes or ${config.flip_game.min_mb_session} MB session.`,
             title: 'Flip Game',
             imgSrc: '/plugins/bonus-plugin/assets/images/flip/' + config.flip_game.game_icon,
             funcButton: 'initFlipGame()'
@@ -619,7 +633,7 @@ function initFlipGame()
   document.querySelector('.flip-game-main-containers').style = "pointer-events: ''; opacity: 1";
   document.querySelector('.start-flip-btn').disabled = true;
   document.querySelector('.session-select').disabled = true;
-
+  document.querySelector('.bet-amount-div').style.display = 'none'
   document.querySelector('.loading-flip-game').style.display = 'block'
   document.querySelector('.choices-image-container').style.animation = 'none';
 
@@ -635,16 +649,20 @@ function initFlipGame()
   roleta_game_div.style = 'display: none'
   flip_game_div.style = 'display: block'
 
-  loadSessionData(first_choice_btn, second_choice_btn);
+  loadSessionData();
 }
 
-function loadSessionData(first_choice_btn, second_choice_btn)
+function loadSessionData()
 {
+  const first_choice_btn = document.querySelector('.first-choice-btn')
+  const second_choice_btn = document.querySelector('.second-choice-btn')
+
   httpGet(sessionsUrl, function(data){
     data = JSON.parse(data);
     const sessions = data.sessions;
     const config = data.config;
-
+    config.flip_game.min_mins_session = parseInt(config.flip_game.min_mins_session)
+    config.flip_game.min_mb_session = parseInt(config.flip_game.min_mb_session)
     if (!config.can_play) {
       var p = document.createElement('p')
       p.className = 'alert alert-info'
@@ -657,7 +675,6 @@ function loadSessionData(first_choice_btn, second_choice_btn)
     first_choice_btn.innerText = config.flip_game.first_choice_text;
     second_choice_btn.innerText = config.flip_game.second_choice_text;
     document.querySelector('.flip-game-title').innerText = "Choose " + config.flip_game.first_choice_text + " or " + config.flip_game.second_choice_text;
-    document.querySelector('.minimum-bet').innerText = 'minimum minutes: ' + config.flip_game.min_mins_session + " | minimum MB: " + config.flip_game.min_mb_session;
 
     document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/flip/first-choice/" + config.flip_game.first_choice_icon;
     document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/flip/second-choice/" + config.flip_game.second_choice_icon;
@@ -669,21 +686,24 @@ function loadSessionData(first_choice_btn, second_choice_btn)
     const session_data = [{value: '', label: "-- Choose Session --"}];
     sessions.forEach(s => {
       var label;
-      const minutes = Math.floor(s.remaining_time_seconds/60);
-
-      if(s.type === 'time' && parseInt(minutes) >= parseInt(config.flip_game.min_mins_session)) {
-        label = convertCredits(minutes);
-      } else if(s.type === 'data' && parseInt(s.remaining_data_mb) >= parseInt(config.flip_game.min_mb_session)) {
-        label = s.remaining_data_mb.toFixed(2) + ' MB';
-      } else if (s.type === 'time_or_data') {
-        if(parseInt(minutes) >= parseInt(config.flip_game.min_mins_session) || parseInt(s.remaining_data_mb) >= parseInt(config.flip_game.min_mb_session)){
-          label = convertCredits(minutes) + ' or ' + s.remaining_data_mb.toFixed(2) + ' MB'
-        }
+      var type;
+      const minutes = parseInt(Math.floor(s.remaining_time_seconds/60));
+      var total_session = 0;
+      if(s.type === 'time' && minutes >= config.flip_game.min_mins_session) {
+        label = convertCreditsShort(s.remaining_time_seconds);
+        total_session = minutes
+        type = 'time'
+      } else if(s.type === 'data' && s.remaining_data_mb >= config.flip_game.min_mb_session) {
+        label = s.remaining_data_mb.toFixed(2) + 'MB';
+        total_session = s.remaining_data_mb
+        type = 'data'
       }
 
-      if(label) {
+      if(total_session > 0) {
         session_data.push({
-          value: s.id,
+          id: s.id,
+          total_session,
+          type,
           label: label + ' session'
         })
       }
@@ -698,28 +718,61 @@ function loadSessionData(first_choice_btn, second_choice_btn)
         <button onclick="closeFlipGame()" class="btn btn-default btn-sm" style="margin-top: 20px">Close</button>
       `
       return;
-    } else {
-      session_data.forEach(item => {
-        const option = document.createElement('option');
-        option.setAttribute('value', item.value)
-        option.textContent = item.label;
-        session_select.appendChild(option)
-      });
-
-      session_select.addEventListener('change', function(){
-        const start_flip_btn = document.querySelector('.start-flip-btn');
-        if(session_select.value){
-          flip_game_bet.session = {
-            value: session_select.value,
-            label: this.options[this.selectedIndex].text
-          }
-          start_flip_btn.disabled = false
-        }else{
-          flip_game_bet.session = null
-          start_flip_btn.disabled = true
-        }
-      })
     }
+
+    session_data.forEach(item => {
+      const option = document.createElement('option');
+      option.setAttribute('value', item.id)
+      option.textContent = item.label;
+      session_select.appendChild(option)
+    });
+    
+    var choosen_session = {}
+    session_select.addEventListener('change', function(){
+      const selected_session = parseInt(session_select.value)
+      if(selected_session){
+        const { total_session, type, label } = session_data.find(item => item.id === selected_session) || {}
+        const minimum = type === 'time' ? config.flip_game.min_mins_session : config.flip_game.min_mb_session
+        const minimum_text = type === 'time' ? minimum + ' mins' : minimum + ' MB'
+        const available_text = type === 'time' ? total_session + ' mins' : total_session + ' MB'
+        document.querySelector('.bet-amount-div').style.display = 'block'
+        document.querySelector('#minimum-available').innerText = `Available: ${available_text} | Minimum: ${minimum_text}`
+
+        choosen_session = {
+          id: selected_session,
+          total_session,
+          type,
+          minimum,
+          bet_session_text: label
+        }
+      }else{
+        document.querySelector('.bet-amount-div').style.display = 'none'
+        choosen_session = null
+      }
+    })
+
+    const bet_amount_input = document.querySelector("#bet-amount")
+    bet_amount_input.value = ''
+    bet_amount_input.addEventListener('input', function(){
+      const value = bet_amount_input.value
+      const start_flip_btn = document.querySelector('.start-flip-btn');
+
+      if(value > 0 && !isNaN(value)) {
+        flip_game_bet.session = {
+          id: choosen_session.id,
+          amount: parseInt(value),
+          total_session: choosen_session.total_session,
+          type: choosen_session.type,
+          minimum: choosen_session.minimum,
+          bet_session_text: choosen_session.bet_session_text
+        }
+        start_flip_btn.disabled = false
+      }else {
+        start_flip_btn.disabled = true
+        flip_game_bet.session = null
+      }
+    })
+
   })
 }
 
@@ -752,15 +805,19 @@ function chooseFlipClick(e){
 }
 
 function startFlip()
-{
-
+{ 
   if(!flip_game_bet || !flip_game_bet.choosen || !flip_game_bet.session){
     return alert('You must have choosen bet!');
+  }else if(flip_game_bet.session.amount > flip_game_bet.session.total_session){
+    return alert('Insufficient session!')
+  }else if(flip_game_bet.session.amount < flip_game_bet.session.minimum)
+  {
+    return alert(`Minimum is ${flip_game_bet.session.minimum}`)
   }
 
   flip_game_started = true;
   const start_flip_btn = document.querySelector('.start-flip-btn');
-  start_flip_btn.innerText = 'Processing ...'
+  start_flip_btn.innerText = 'Flipping ...'
   document.querySelector('.flip-game-main-containers').style = "pointer-events: none; opacity: 0.5";
 
   httpGet(sessionsUrl, function(data){
@@ -770,8 +827,8 @@ function startFlip()
     document.querySelector('.front-image').src="/plugins/bonus-plugin/assets/images/flip/first-choice/" + config.flip_game.first_choice_icon;
     document.querySelector('.back-image').src="/plugins/bonus-plugin/assets/images/flip/second-choice/" + config.flip_game.second_choice_icon;
     
-    const bet_session = (sessions.filter(s => s.id == flip_game_bet.session.value) || {})[0];
-    if(!bet_session || bet_session.status !== 'available'){
+    const session = (sessions.filter(s => s.id == flip_game_bet.session.id) || {})[0];
+    if(!session || session.status !== 'available'){
       const error_div = document.querySelector('.flip-game-error-div');
       error_div.style.display = 'block'
       error_div.innerHTML = `
@@ -797,12 +854,20 @@ function startFlip()
       final_result = result
       final_result_text = result_text
     }
+
+    // bet config
+    const bet_session = {
+      label: flip_game_bet.session.type === 'time' ? flip_game_bet.session.amount + ' minutes session' : flip_game_bet.session.amount + 'MB session',
+      id: flip_game_bet.session.id,
+      bet_session_text: flip_game_bet.session.bet_session_text,
+      type: flip_game_bet.session.type,
+      amount: flip_game_bet.session.amount
+    }
     
     // 4.9 seconds process
     setTimeout( async () => {
       start_flip_btn.innerText = "Flip"
       flip_game_started = false;
-      bet_session.label = flip_game_bet.session.label;
       if(flip_game_bet.choosen === final_result){
         winFlipGame(final_result_text, bet_session);
       }else {
@@ -850,8 +915,8 @@ function winFlipGame(result, session)
   const flip_game_win_or_lose_div = document.querySelector('.flip-game-win-or-lose-div')
   
   httpPost(addBonusUrl, {
-    bonus_minutes: Math.floor(session.remaining_time_seconds/60),
-    bonus_mb: session.remaining_data_mb, 
+    bonus_minutes: session.type === 'time' ? session.amount : 0,
+    bonus_mb: session.type === 'data' ? session.amount : 0, 
     prize_log_text, 
     game: 'flip_game'}, function (data) {
       if (data.error) {
@@ -875,8 +940,8 @@ function winFlipGame(result, session)
 function loseFlipGame(result, session)
 {
   const flip_game_win_or_lose_div = document.querySelector('.flip-game-win-or-lose-div')
-
-  httpPost(removeSessionUrl, {id : session.id }, function(data){
+  const deduct_text = session.type === 'time' ? session.amount + ' minutes' : session.amount + 'MB'
+  httpPost(removeSessionUrl, {id : session.id, amount: session.amount, type: session.type }, function(data){
     if (data.error) {
       return alert(data.error)
     }
@@ -884,7 +949,7 @@ function loseFlipGame(result, session)
       flip_game_win_or_lose_div.style.display = 'block';
       flip_game_win_or_lose_div.innerHTML = `
         <h3 class="text-danger"  style="margin-bottom: 5px">Result: ${result}<h3>
-        <h3 class="text-danger">You lose the ${session.label}</h3>
+        <h3 class="text-danger">You lose, your '${session.bet_session_text}' has been deducted by ${deduct_text}</h3>
         <div class="text-center" style="margin-top: 10px">
           <button class="btn btn-success" onclick="closeFlipGamePopUp()">Play</button>
         </div>
