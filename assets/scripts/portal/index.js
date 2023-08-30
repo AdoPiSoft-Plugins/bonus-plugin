@@ -78,6 +78,7 @@ function closeBonus () {
     }
     tabClick(1)
     closeRoleta()
+    closeFlipGame()
   }
 }
 
