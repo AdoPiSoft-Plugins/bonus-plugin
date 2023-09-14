@@ -2,13 +2,13 @@ const path = require('path')
 const fsExtra = require('fs-extra')
 const randomstring = require('randomstring')
 
-var sounds_dir_path = path.join('/opt/adopisoft/plugins/bonus-plugin/assets/sounds')
-var img_dir_path = path.join('/opt/adopisoft/plugins/bonus-plugin/assets/images/');
+var sounds_dir_path =  path.join(__dirname, '/assets/sounds');
+var img_dir_path = path.join(__dirname, '/assets/images/');
 
-// removeIf(prod)
-sounds_dir_path = path.join(__dirname, '/assets/sounds')
-img_dir_path = path.join(__dirname, '/assets/images/');
-// endRemoveIf(prod)
+// removeIf(!prod)
+sounds_dir_path = path.join('/opt/adopisoft/plugins/bonus-plugin/assets/sounds');
+img_dir_path = path.join('/opt/adopisoft/plugins/bonus-plugin/assets/images/');
+// endRemoveIf(!prod)
 
 const core = require('../core.js')
 const { plugin_config } = core
